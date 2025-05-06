@@ -36,6 +36,11 @@ Options:
   -s (on|off), --switch (on|off)                                               Enable or disable the switch.
 ```
 ```
+Usage: restore [digital]
+
+Description: Restores the digital mode. Use this command if the system has switched to an alternative mode (analog mode).
+```
+```
 Usage: exit
 
 Description: Terminates the current prompt. Also sends a reset message to all decoders.

@@ -8,6 +8,7 @@
 Command commands[] = {
     {"loc", cmd_loc, "Usage: loc (--address <address> | --alias <alias>) [OPTION]...\n", "Description: Gives access to the configuration for locomotives.\n", "Options:\n  -a <address>, --address <address>                                            Select the address of the locomotive which should be changed.\n  -A <alias>, --alias <alias>                                                  Select the alias of the locomotive which should be changed. Is internally resolved to the address which is configured for this alias.\n  -d (forward | backward), --direction (forward | backward)                    Set the direction in which the locomotive should drive.\n  -h, --help                                                                   Show this screen.\n  -l (on|off), --light-on (on|off)                                             Enable or disable the light of the locomotive.\n  --list                                                                       List the available locomotives.\n  -m, --monitor                                                                Shows the current configuration of the locomotive.\n  -s <Stop | E-Stop | Step1..28>, --speed <Stop | E-Stop | Step1..28>          Set the speed the locomotive should drive.\n"},
     {"mag", cmd_mag, "Usage: mag (--address <address> | --alias <alias>) --device <device> [OPTION]...\n", "Description: Gives access to the configuration for magnetic accessories.\n", "Options:\n  -a <address>, --address <address>                                            Select the address of the accessory which should be changed.\n  -A <alias>, --alias <alias>                                                  Select the alias of the accessory which should be changed. Is internally resolved to the address which is configured for this alias.\n  -d <device>, --device <device>                                               Select the device (1-4) which which should be changed.\n  -s (on|off), --switch (on|off)                                               Enable or disable the switch.\n"},
+    {"restore", cmd_restore, "Usage: restore [digital]\n", "Description: Restores the digital mode. Use this command if the system has switched to an alternative mode (analog mode).\n", ""},
     {"help", cmd_help, "Usage: help\n       help <command>\n", "Description: Show this help or used with <command> --help.\n", ""},
     {"exit", NULL, "Usage: exit\n", "Description: Terminates the current prompt. Also sends a reset message to all decoders.\n", ""},
     {NULL, NULL, NULL}};
@@ -141,6 +142,34 @@ void cmd_mag(char *args)
         for (int i = 0; i < CMD_CNT; i++)
         {
             if (strcmp("mag", commands[i].name) == 0)
+            {
+                printf(commands[i].usage);
+                return;
+            }
+        }
+    }
+}
+
+void cmd_restore(char *args)
+{
+    int a, b;
+    if (sscanf(args, "%d %d", &a, &b) == 2) // TODO: add correct options scanning
+    {
+        if (a)
+        {
+            // TODO: Call corrsponding functions
+            printf("Restore mode: digital\n");
+        }
+        else
+        {
+            printf("Unsupported mode: %s\n", a);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < CMD_CNT; i++)
+        {
+            if (strcmp("restore", commands[i].name) == 0)
             {
                 printf(commands[i].usage);
                 return;
