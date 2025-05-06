@@ -18,6 +18,7 @@ int prompt(char **command, char **args);
 int handle_command(const char *command, char *args);
 void cmd_loc(char *args);
 void cmd_mag(char *args);
+void cmd_restore(char *args);
 void cmd_help(char *args);
 
 #endif
