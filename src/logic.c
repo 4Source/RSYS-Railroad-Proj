@@ -3,7 +3,6 @@
 #include <rtai_sched.h>
 #include <rtai_sem.h>
 
-
 #define BIT_1_TIME 58000  /* 58 microseconds*/
 #define BIT_0_TIME 100000 /* 100 microsecdons*/
 
@@ -14,7 +13,7 @@ SEM mutex;
 
 RT_TASK msg_task;
 
-uint64_t message = 0xFFFC066230C00000;//0x5555555555555555;
+uint64_t message = 0xFFFC066230C00000; // 0x5555555555555555;
 int length = 42;
 
 static void send_bit_task(long n)
@@ -38,7 +37,7 @@ static void send_bit_task(long n)
       rt_sleep(nano2count(BIT_0_TIME));
     }
   }
-  rt_mutex_unlock(&mutex)
+  rt_mutex_unlock(&mutex);
 }
 
 static __init int send_init(void)
@@ -50,10 +49,10 @@ static __init int send_init(void)
 
   rt_set_periodic_mode();
   start_rt_timer(nano2count(20000));
-  
-  rt_task_make_periodic(&msg_task, rt_get_time() + nano2count(1000000), nano2count(20000))
 
-  //rt_task_resume(&msg_task);
+  rt_task_make_periodic(&msg_task, rt_get_time() + nano2count(1000000), nano2count(20000));
+
+  // rt_task_resume(&msg_task);
 
   rt_printk("Module loaded\n");
 
@@ -67,7 +66,7 @@ static __exit void send_exit(void)
   rt_task_delete(&msg_task);
   rt_mutex_delete(&mutex)
 
-  rt_umount();
+      rt_umount();
   rt_printk("Unloading module\n");
 }
 
