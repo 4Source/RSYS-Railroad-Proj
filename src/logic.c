@@ -10,9 +10,13 @@
 
 RT_TASK mytask;
 
-static void send_bit_task(uint64_t message, int length)
+uint64_t message = 0x5555555555555555;
+int length = 42;
+
+static void send_bit_task(/*uint64_t message, int length*/)
 {
-  for (int i = 0; i < length; i++)
+  int i;
+  for (i = 0; i < length; i++)
   {
     if ((message >> (63 - i)) & 0x01 == 1)
     {
