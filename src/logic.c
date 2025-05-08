@@ -13,7 +13,7 @@ RT_TASK mytask;
 uint64_t message = 0x5555555555555555;
 int length = 42;
 
-static void send_bit_task(/*uint64_t message, int length*/)
+static void send_bit_task(void/*uint64_t message, int length*/)
 {
   int i;
   for (i = 0; i < length; i++)
