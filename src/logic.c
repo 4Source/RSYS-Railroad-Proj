@@ -18,26 +18,31 @@ int length = 42;
 
 static void send_bit_task(long n)
 {
+
   int i;
-  rt_mutex_lock(&mutex);
-  for (i = 0; i < length; i++)
+  while (1)
   {
-    if (((message >> (63 - i)) & 0x01) == 1)
+    rt_mutex_lock(&mutex);
+    for (i = 0; i < length; i++)
     {
-      outb(0x00, LPT1);
-      rt_sleep(nano2count(BIT_1_TIME));
-      outb(0xFF, LPT1);
-      rt_sleep(nano2count(BIT_1_TIME));
+      if (((message >> (63 - i)) & 0x01) == 1)
+      {
+        outb(0x00, LPT1);
+        rt_sleep(nano2count(BIT_1_TIME));
+        outb(0xFF, LPT1);
+        rt_sleep(nano2count(BIT_1_TIME));
+      }
+      else
+      {
+        outb(0x00, LPT1);
+        rt_sleep(nano2count(BIT_0_TIME));
+        outb(0xFF, LPT1);
+        rt_sleep(nano2count(BIT_0_TIME));
+      }
     }
-    else
-    {
-      outb(0x00, LPT1);
-      rt_sleep(nano2count(BIT_0_TIME));
-      outb(0xFF, LPT1);
-      rt_sleep(nano2count(BIT_0_TIME));
-    }
+    rt_mutex_unlock(&mutex);
+    rt_task_wait_period();
   }
-  rt_mutex_unlock(&mutex);
 }
 
 static __init int send_init(void)
