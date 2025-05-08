@@ -15,27 +15,8 @@ RT_TASK msg_periodic_task;
 
 uint64_t message = 0xFFFC066230C00000; // 0x5555555555555555;
 int length = 42;
-uint64_t[] msg_queue = {0xFFFC066230C00000};
+uint64_t msg_queue[] = {0xFFFC066230C00000};
 int msg_count = 1;
-
-static void send_msg_task(long n)
-{
-  int i = 0;
-  while (1)
-  {
-    if (i >= 0 && i < msg_count)
-    {
-      // TODO: buildTelegram() to create message from data object
-      send_bit_task(msg_queue[i], length);
-    }
-    rt_task_wait_period();
-    i++;
-    if (i >= msg_count)
-    {
-      i = 0;
-    }
-  }
-}
 
 static void send_bit_task(uint64_t message, int length)
 {
@@ -62,6 +43,25 @@ static void send_bit_task(uint64_t message, int length)
   rt_mutex_unlock(&bit_mutex);
 }
 
+static void send_msg_task(long n)
+{
+  int i = 0;
+  while (1)
+  {
+    if (i >= 0 && i < msg_count)
+    {
+      // TODO: buildTelegram() to create message from data object
+      send_bit_task(msg_queue[i], length);
+    }
+    rt_task_wait_period();
+    i++;
+    if (i >= msg_count)
+    {
+      i = 0;
+    }
+  }
+}
+
 static __init int send_init(void)
 {
   rt_mount();
@@ -83,7 +83,7 @@ static __exit void send_exit(void)
 {
   stop_rt_timer();
 
-  rt_task_delete(&msg_task);
+  rt_task_delete(&msg_periodic_task);
   rt_mutex_delete(&bit_mutex)
 
       rt_umount();
