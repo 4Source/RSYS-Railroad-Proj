@@ -53,9 +53,9 @@ static __init int send_init(void)
   rt_task_init(&msg_task, send_bit_task, 0, STACK_SIZE, 1, 0, 0);
 
   rt_set_periodic_mode();
-  start_rt_timer(nano2count(20000));
+  start_rt_timer(nano2count(20000000));
 
-  rt_task_make_periodic(&msg_task, rt_get_time() + nano2count(1000000), nano2count(20000));
+  rt_task_make_periodic(&msg_task, rt_get_time() + nano2count(1000000000), nano2count(20000000));
 
   // rt_task_resume(&msg_task);
 
