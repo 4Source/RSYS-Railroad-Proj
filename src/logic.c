@@ -2,33 +2,35 @@
 #include <rtai.h>
 #include <rtai_sched.h>
 
-
-#define BIT_1_TIME 58000 /* 58 microseconds*/
-#define BIT_0_TIME 95000 /* 95 microsecdons*/
+#define BIT_1_TIME 58000  /* 58 microseconds*/
+#define BIT_0_TIME 100000 /* 100 microsecdons*/
 
 #define STACK_SIZE 4096
 #define LPT1 0x378 /*Pin des Parallelports*/
 
 RT_TASK mytask;
 
-static void send_bit_task(uint64_t message) {
-    for (int i = 0; i < 40; i++) {
-      uint8_t bit = (message >> 63) & 0x01;
-      if (bit == 1) {
-        outb(0x00, LPT1);
-        rt_sleep(nano2count(BIT_1_TIME));
-        outb(0xFF, LPT1);
-        rt_sleep(nano2count(BIT_1_TIME));
-    } else {
-        outb(0x00, LPT1);
-        rt_sleep(nano2count(BIT_0_TIME));
-        outb(0xFF, LPT1);
-        rt_sleep(nano2count(BIT_0_TIME));
+static void send_bit_task(uint64_t message, int length)
+{
+  for (int i = 0; i < length; i++)
+  {
+    if ((message >> (63 - i)) & 0x01 == 1)
+    {
+      outb(0x00, LPT1);
+      rt_sleep(nano2count(BIT_1_TIME));
+      outb(0xFF, LPT1);
+      rt_sleep(nano2count(BIT_1_TIME));
     }
-    msg << 1;
+    else
+    {
+      outb(0x00, LPT1);
+      rt_sleep(nano2count(BIT_0_TIME));
+      outb(0xFF, LPT1);
+      rt_sleep(nano2count(BIT_0_TIME));
     }
+  }
 }
-   
+
 static __init int send_init(void)
 {
   rt_mount();
@@ -45,7 +47,7 @@ static __init int send_init(void)
   return 0;
 }
 
-static __exit void send_exit(void) 
+static __exit void send_exit(void)
 {
   stop_rt_timer();
 
