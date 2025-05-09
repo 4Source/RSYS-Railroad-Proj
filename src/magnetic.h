@@ -1,6 +1,8 @@
 #ifndef MAGNETIC_H
 #define MAGNETIC_H
 
+#include <stdint.h>
+
 /**
  * @struct MagneticData
  * @brief Represents the magnetic data with bit fields for various parameters.
@@ -42,7 +44,7 @@ typedef struct
  * This structure is used to construct a magnetic telegram for communication.
  * It contains the following fields:
  * - reserved: A 22-bit reserved field for future use.
- * - end: A 1-bit field indicating the end of the telegram.
+ * - stop_bit: A 1-bit field indicating the stop_bit of the telegram.
  * - checksum: An 8-bit field for the checksum value.
  * - start_bit_cs: A 1-bit field for the start bit of the checksum.
  * - enable: A 1-bit field indicating whether the magnetic device is enabled.
@@ -59,7 +61,7 @@ typedef struct
 typedef struct
 {
     uint64_t reserved : 22;         // [bit 0 - 21]    Reserved for future use.
-    uint64_t end : 1;               // [bit 22]        Indicates the end of the telegram. Values: 0, 1.
+    uint64_t stop_bit : 1;          // [bit 22]        Indicates the stop_bit of the telegram. Values: 0, 1.
     uint64_t checksum : 8;          // [bit 23 - 30]   Checksum value for error detection. Values: 0 - 255 (0xFF).
     uint64_t start_bit_cs : 1;      // [bit 31]        Start bit for checksum field. Values: 0, 1.
     uint64_t enable : 1;            // [bit 32]        Enables or disables the magnetic device. Values: 0, 1.
