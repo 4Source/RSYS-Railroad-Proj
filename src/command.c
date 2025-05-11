@@ -6,7 +6,7 @@
 
 #define CMD_CNT 5
 Command commands[] = {
-    {"loc", cmd_loc, "Usage: loc (--address <address> | --alias <alias>) [OPTION]...\n", "Description: Gives access to the configuration for locomotives.\n", "Options:\n  -a <address>, --address <address>                                            Select the address of the locomotive which should be changed.\n  -A <alias>, --alias <alias>                                                  Select the alias of the locomotive which should be changed. Is internally resolved to the address which is configured for this alias.\n  -d (forward | backward), --direction (forward | backward)                    Set the direction in which the locomotive should drive.\n  -h, --help                                                                   Show this screen.\n  -l (on|off), --light-on (on|off)                                             Enable or disable the light of the locomotive.\n  --list                                                                       List the available locomotives.\n  -m, --monitor                                                                Shows the current configuration of the locomotive.\n  -s <Stop | E-Stop | Step1..28>, --speed <Stop | E-Stop | Step1..28>          Set the speed the locomotive should drive.\n"},
+    {"loc", cmd_loc, "Usage: loc (--address <address> | --alias <alias>) [OPTION]...\n", "Description: Gives access to the configuration for locomotives.\n", "Options:\n  -a <address>, --address <address>                                            Select the address of the locomotive which should be changed.\n  -A <alias>, --alias <alias>                                                  Select the alias of the locomotive which should be changed. Is internally resolved to the address which is configured for this alias.\n  -d (forward | backward), --direction (forward | backward)                    Set the direction in which the locomotive should drive.\n  -h, --help                                                                   Show this screen.\n  -l (on|off), --light (on|off)                                                Enable or disable the light of the locomotive.\n  --list                                                                       List the available locomotives.\n  -m, --monitor                                                                Shows the current configuration of the locomotive.\n  -s <stop | e-stop | 0-15>, --speed <stop | e-stop | 0-15>                    Set the speed the locomotive should drive.\n"},
     {"mag", cmd_mag, "Usage: mag (--address <address> | --alias <alias>) --device <device> [OPTION]...\n", "Description: Gives access to the configuration for magnetic accessories.\n", "Options:\n  -a <address>, --address <address>                                            Select the address of the accessory which should be changed.\n  -A <alias>, --alias <alias>                                                  Select the alias of the accessory which should be changed. Is internally resolved to the address which is configured for this alias.\n  -d <device>, --device <device>                                               Select the device (1-4) which which should be changed.\n  -s (on|off), --switch (on|off)                                               Enable or disable the switch.\n"},
     {"restore", cmd_restore, "Usage: restore [digital]\n", "Description: Restores the digital mode. Use this command if the system has switched to an alternative mode (analog mode).\n", ""},
     {"help", cmd_help, "Usage: help\n       help <command>\n", "Description: Show this help or used with <command> --help.\n", ""},
@@ -110,17 +110,190 @@ int handle_command(const char *command, char *args)
 
 void cmd_loc(char *args)
 {
-    int a, b;
-    if (sscanf(args, "%d %d", &a, &b) == 2) // TODO: add correct options scanning
+    const char *cmd_name = "loc";
+    int options_valid = 1;
+
+    int address = -1;
+    char alias[20] = "";
+    int direction = -1;
+    int light = -1;
+    int speed = -1;
+    int monitor = 0;
+
+    // Tokenize the arguments
+    char *option = strtok(args, " ");
+    while (option != NULL)
     {
-        printf("Result: %d\n", a + b);
-        // TODO: Call corrsponding functions
+        if (strcmp(option, "-a") == 0 || strcmp(option, "--address") == 0)
+        {
+            // Get the value for the address
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (sscanf(value, "%d", &address) != 1)
+                {
+                    printf("Invalid argument '%s' for address\n", value);
+                    options_valid = 0;
+                }
+            }
+            else
+            {
+                printf("Missing argument for address\n");
+                options_valid = 0;
+            }
+        }
+        else if (strcmp(option, "-A") == 0 || strcmp(option, "--alias") == 0)
+        {
+            // Get the value for the alias
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (sscanf(value, "%[A-Z,a-z,0-9]s", &alias) != 1)
+                {
+                    printf("Invalid argument '%s' for alias\n", value);
+                    options_valid = 0;
+                }
+            }
+            else
+            {
+                printf("Missing argument for alias\n");
+                options_valid = 0;
+            }
+        }
+        else if (strcmp(option, "-d") == 0 || strcmp(option, "--direction") == 0)
+        {
+            // Get the value for the direction
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (strcmp(value, "forward") == 0)
+                {
+                    direction = 1;
+                }
+                else if (strcmp(value, "backward") == 0)
+                {
+                    direction = 0;
+                }
+                else
+                {
+                    printf("Invalid argument '%s' for direction\n", value);
+                    options_valid = 0;
+                }
+            }
+            else
+            {
+                printf("Missing argument for direction\n");
+                options_valid = 0;
+            }
+        }
+        else if (strcmp(option, "-l") == 0 || strcmp(option, "--light") == 0)
+        {
+            // Get the value for the direction
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (strcmp(value, "on") == 0)
+                {
+                    light = 1;
+                }
+                else if (strcmp(value, "off") == 0)
+                {
+                    light = 0;
+                }
+                else
+                {
+                    printf("Invalid argument '%s' for light\n", value);
+                    options_valid = 0;
+                }
+            }
+            else
+            {
+                printf("Missing argument for light\n");
+                options_valid = 0;
+            }
+        }
+        else if (strcmp(option, "-s") == 0 || strcmp(option, "--speed") == 0)
+        {
+            // Get the value for the direction
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (strcmp(value, "stop") == 0)
+                {
+                    speed = 0;
+                }
+                else if (strcmp(value, "e-stop") == 0)
+                {
+                    speed = 1;
+                }
+                else if (sscanf(value, "%d", &speed) != 1 || speed > 15)
+                {
+                    printf("Invalid argument '%s' for speed\n", value);
+                    options_valid = 0;
+                }
+            }
+            else
+            {
+                printf("Missing argument for speed\n");
+                options_valid = 0;
+            }
+        }
+        else if (strcmp(option, "-m") == 0 || strcmp(option, "--monitor") == 0)
+        {
+            monitor = 1;
+            return;
+        }
+        else if (strcmp(option, "--list") == 0)
+        {
+            // TODO: List the available locomotives
+            printf("Locomotives:\n");
+            return;
+        }
+        else
+        {
+            printf("Unknown option '%s' for command '%s'\n", option, cmd_name);
+            options_valid = 0;
+        }
+
+        // Move to the next option
+        option = strtok(NULL, " ");
+    }
+
+    if (!options_valid)
+    {
+        printf("See '%s --help' for more informations.\n", cmd_name);
+        return;
+    }
+
+    // Check if address or alias is set
+    if (address >= 0 || alias[0] != '\0')
+    {
+        if (address < 0 && alias[0] != '\0')
+        {
+            // TODO: Resolve address from alias
+        }
+
+        if (monitor)
+        {
+            // TODO: Read the values from current state
+            printf("%s (%s) - dir: %d, light: %d, speed: %d\n", address, alias, direction, light, speed);
+            return;
+        }
+
+        printf("-------------\n");
+        printf("Address: %d\n", address);
+        printf("Alias: %s\n", alias[0] != '\0' ? alias : "Undefined");
+        printf("Direction: %d\n", direction);
+        printf("Light: %d\n", light);
+        printf("Speed: %d\n", speed);
+        printf("-------------\n");
+        // TODO: Call corresponding functions
     }
     else
     {
         for (int i = 0; i < CMD_CNT; i++)
         {
-            if (strcmp("loc", commands[i].name) == 0)
+            if (strcmp(cmd_name, commands[i].name) == 0)
             {
                 printf(commands[i].usage);
                 return;
