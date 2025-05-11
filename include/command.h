@@ -14,6 +14,12 @@ typedef struct
     const char *options;
 } Command;
 
+enum power_mode
+{
+    digital = 1,
+    analog = 2,
+};
+
 int prompt(char **command, char **args);
 int handle_command(const char *command, char *args);
 void cmd_loc(char *args);
