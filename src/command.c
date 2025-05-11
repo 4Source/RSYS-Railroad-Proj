@@ -325,29 +325,59 @@ void cmd_mag(char *args)
 
 void cmd_restore(char *args)
 {
-    int a, b;
-    if (sscanf(args, "%d %d", &a, &b) == 2) // TODO: add correct options scanning
+    const char *cmd_name = "restore";
+    int options_valid = 1;
+
+    enum power_mode mode = digital;
+
+    // Tokenize the arguments
+    char *option = strtok(args, " ");
+    while (option != NULL)
     {
-        if (a)
+        if (strcmp(option, "digital") == 0)
         {
-            // TODO: Call corrsponding functions
-            printf("Restore mode: digital\n");
+            mode = digital;
+        }
+        else if (strcmp(option, "analog") == 0)
+        {
+            mode = analog;
         }
         else
         {
-            printf("Unsupported mode: %s\n", a);
+            printf("Unknown option '%s' for command '%s'\n", option, cmd_name);
+            options_valid = 0;
         }
+
+        // Move to the next option
+        option = strtok(NULL, " ");
     }
-    else
+
+    if (!options_valid)
     {
+        printf("See '%s --help' for more informations.\n", cmd_name);
+        return;
+    }
+
+    switch (mode)
+    {
+    case digital:
+        printf("Restore mode: digital\n");
+        // TODO: Call corrsponding function
+        break;
+    case analog:
+        printf("Currently unsupported to switch to mode 'analog'!");
+        break;
+
+    default:
         for (int i = 0; i < CMD_CNT; i++)
         {
-            if (strcmp("restore", commands[i].name) == 0)
+            if (strcmp(cmd_name, commands[i].name) == 0)
             {
                 printf(commands[i].usage);
                 return;
             }
         }
+        break;
     }
 }
 
