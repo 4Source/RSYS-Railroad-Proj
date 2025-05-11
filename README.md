@@ -14,10 +14,10 @@ Options:
   -A <alias>, --alias <alias>                                                  Select the alias of the locomotive which should be changed. Is internally resolved to the address which is configured for this alias.
   -d (forward | backward), --direction (forward | backward)                    Set the direction in which the locomotive should drive.
   -h, --help                                                                   Show this screen.
-  -l (on|off), --light-on (on|off)                                             Enable or disable the light of the locomotive.
+  -l (on|off), --light (on|off)                                                Enable or disable the light of the locomotive.
   --list                                                                       List the available locomotives.
   -m, --monitor                                                                Shows the current configuration of the locomotive.
-  -s <Stop | E-Stop | Step1..28>, --speed <Stop | E-Stop | Step1..28>          Set the speed the locomotive should drive. 
+  -s <stop | e-stop | 0-15>, --speed <stop | e-stop | 0-15>                    Set the speed the locomotive should drive. 
 ```
 ```
 Usage: mag (--address <address> | --alias <alias>) --device <device> [OPTION]...
