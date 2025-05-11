@@ -130,7 +130,7 @@ void cmd_loc(char *args)
             char *value = strtok(NULL, " ");
             if (value != NULL)
             {
-                if (sscanf(value, "%d", &address) != 1)
+                if (sscanf(value, "%d", &address) != 1 || address > 127)
                 {
                     printf("Invalid argument '%s' for address\n", value);
                     options_valid = 0;
@@ -304,17 +304,136 @@ void cmd_loc(char *args)
 
 void cmd_mag(char *args)
 {
-    int a, b;
-    if (sscanf(args, "%d %d", &a, &b) == 2) // TODO: add correct options scanning
+    const char *cmd_name = "mag";
+    int options_valid = 1;
+
+    int address = -1;
+    char alias[20] = "";
+    int device = -1;
+    int switch_state = -1;
+
+    // Tokenize the arguments
+    char *option = strtok(args, " ");
+    while (option != NULL)
     {
-        printf("Result: %d\n", a + b);
-        // TODO: Call corrsponding functions
+        if (strcmp(option, "-a") == 0 || strcmp(option, "--address") == 0)
+        {
+            // Get the value for the address
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (sscanf(value, "%d", &address) != 1 || address > 512)
+                {
+                    printf("Invalid argument '%s' for address\n", value);
+                    options_valid = 0;
+                }
+            }
+            else
+            {
+                printf("Missing argument for address\n");
+                options_valid = 0;
+            }
+        }
+        else if (strcmp(option, "-A") == 0 || strcmp(option, "--alias") == 0)
+        {
+            // Get the value for the alias
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (sscanf(value, "%[A-Z,a-z,0-9]s", &alias) != 1)
+                {
+                    printf("Invalid argument '%s' for alias\n", value);
+                    options_valid = 0;
+                }
+            }
+            else
+            {
+                printf("Missing argument for alias\n");
+                options_valid = 0;
+            }
+        }
+        else if (strcmp(option, "-d") == 0 || strcmp(option, "--device") == 0)
+        {
+            // Get the value for the direction
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (sscanf(value, "%d", &device) != 1 || device > 4 || device < 1)
+                {
+                    printf("Invalid argument '%s' for device\n", value);
+                    options_valid = 0;
+                }
+                device -= 1;
+            }
+            else
+            {
+                printf("Missing argument for device\n");
+                options_valid = 0;
+            }
+        }
+        else if (strcmp(option, "-s") == 0 || strcmp(option, "--switch") == 0)
+        {
+            // Get the value for the direction
+            char *value = strtok(NULL, " ");
+            if (value != NULL)
+            {
+                if (strcmp(value, "on") == 0)
+                {
+                    switch_state = 1;
+                }
+                else if (strcmp(value, "off") == 0)
+                {
+                    switch_state = 0;
+                }
+                else
+                {
+                    printf("Invalid argument '%s' for switch\n", value);
+                    options_valid = 0;
+                }
+            }
+            else
+            {
+                printf("Missing argument for switch\n");
+                options_valid = 0;
+            }
+        }
+        else
+        {
+            printf("Unknown option '%s' for command '%s'\n", option, cmd_name);
+            options_valid = 0;
+        }
+
+        // Move to the next option
+        option = strtok(NULL, " ");
+    }
+
+    if (!options_valid)
+    {
+        printf("See '%s --help' for more informations.\n", cmd_name);
+        return;
+    }
+
+    // Check if address or alias is set
+    if (address >= 0 || alias[0] != '\0')
+    {
+        if (address < 0 && alias[0] != '\0')
+        {
+            // TODO: Resolve address from alias
+        }
+
+        printf("-------------\n");
+        printf("Address: %d\n", address);
+        printf("Alias: %s\n", alias[0] != '\0' ? alias : "Undefined");
+        printf("Device: %d\n", device);
+        printf("Switch: %d\n", switch_state);
+        printf("-------------\n");
+        // TODO: Call corresponding functions
     }
     else
     {
         for (int i = 0; i < CMD_CNT; i++)
         {
-            if (strcmp("mag", commands[i].name) == 0)
+            if (strcmp(cmd_name, commands[i].name) == 0)
             {
                 printf(commands[i].usage);
                 return;
