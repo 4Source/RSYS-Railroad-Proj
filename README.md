@@ -15,8 +15,8 @@ Usage: loc (--address <address> | --alias <alias>) [OPTION]...
 Description: Gives access to the configuration for locomotives.
 
 Options:
-  -a <address>, --address <address>                                            Select the address of the locomotive which should be changed.
-  -A <alias>, --alias <alias>                                                  Select the alias of the locomotive which should be changed. Is internally resolved to the address which is configured for this alias.
+  -a <address>, --address <address>                                            Select the address of the locomotive which should be changed. Address range is 0 to 127.
+  -A <alias>, --alias <alias>                                                  Select the alias of the locomotive which should be changed. Is internally resolved to the address which is configured for this alias. 
   -d (forward | backward), --direction (forward | backward)                    Set the direction in which the locomotive should drive.
   -h, --help                                                                   Show this screen.
   -l (on|off), --light (on|off)                                                Enable or disable the light of the locomotive.
@@ -30,7 +30,7 @@ Usage: mag (--address <address> | --alias <alias>) --device <device> [OPTION]...
 Description: Gives access to the configuration for magnetic accessories.
 
 Options:
-  -a <address>, --address <address>                                            Select the address of the accessory which should be changed.
+  -a <address>, --address <address>                                            Select the address of the accessory which should be changed. Address range is 0 to 511.
   -A <alias>, --alias <alias>                                                  Select the alias of the accessory which should be changed. Is internally resolved to the address which is configured for this alias.
   -d <device>, --device <device>                                               Select the device (1-4) which which should be changed.
   -s (on|off), --switch (on|off)                                               Enable or disable the switch.
