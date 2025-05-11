@@ -34,7 +34,7 @@ typedef struct
 typedef struct
 {
     LocomotiveData data; // A LocomotiveData structure holding the locomotive data.
-    const char *alias;   // A constant character pointer for the alias name.
+    char alias[20];      // A character array with a fixed length of 20 for the alias name.
 } Locomotive;
 
 /**
