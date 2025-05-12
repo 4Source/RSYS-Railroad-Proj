@@ -6,14 +6,13 @@
 
 obj-m	:= logic.o
 
+KDIR	:= /lib/modules/$(shell uname -r)/build
 PWD	:= $(shell pwd)
-KDIR	:= $(PWD)/build
-SRCDIR	:= $(PWD)/src
-EXTRA_CFLAGS := -I /usr/realtime/include -I/usr/src/linux/include -I$(PWD)/include
-EXTRA_LFLAGS := -L/usr/realtime/lib -lpthread
+EXTRA_CFLAGS := -I/usr/realtime/include -I/usr/src/linux/include -I$(PWD)/include
 
 default:
-	$(MAKE) -C $(KDIR) SUBDIRS=$(SRCDIR) SRC=$(SRCDIR)/logic.c modules
+	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
+
 
 clean:
 	rm -r .tmp_versions
