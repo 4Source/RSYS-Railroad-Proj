@@ -15,7 +15,7 @@ RT_TASK msg_periodic_task;
 
 uint64_t message = 0xFFFC066230C00000; // 0x5555555555555555;
 int length = 42;
-uint64_t msg_queue[] = {0b111111111111110000000110011101000011101111<<22};
+uint64_t msg_queue[] = {0b111111111111110000000110011111110011111001<<22};
 int msg_count = 1;
 
 static void send_bit_task(uint64_t message, int length)
