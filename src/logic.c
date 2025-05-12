@@ -15,13 +15,13 @@ RT_TASK msg_periodic_task;
 
 uint64_t message = 0xFFFC066230C00000; // 0x5555555555555555;
 int length = 42;
-uint64_t msg_queue[] = {0xFFFC066230C00000};
+uint64_t msg_queue[] = {0b111111111111110000000110011101000011101111<<22};
 int msg_count = 1;
 
 static void send_bit_task(uint64_t message, int length)
 {
   outb(0x00, LPT1); // set start voltlevel
-  rt_sleep(nano2count(1000000)); // wait 1ms
+  rt_sleep(nano2count(500000)); // wait 0.5ms
   int i;
   rt_mutex_lock(&bit_mutex);
   for (i = 0; i < length; i++)
