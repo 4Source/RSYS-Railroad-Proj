@@ -4,19 +4,17 @@
 #   (at your option) any later version.
 #
 
-obj-m	:= logic.o
+obj-m := logic.o
 
-KDIR	:= /lib/modules/$(shell uname -r)/build
-PWD	:= $(shell pwd)
-EXTRA_CFLAGS := -I/usr/realtime/include -I/usr/src/linux/include -I$(PWD)/include
+KDIR := /lib/modules/$(shell uname -r)/build
+PWD := $(shell pwd)
+SRC_DIR := $(PWD)/src
+BUILD_DIR := $(PWD)/build
+EXTRA_CFLAGS := -I/usr/realtime/include -I/usr/src/linux/include -I$(SRC_DIR)/include
 
 default:
-	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
-
+    mkdir -p $(BUILD_DIR)
+    $(MAKE) -C $(KDIR) M=$(SRC_DIR) O=$(BUILD_DIR) modules
 
 clean:
-	rm -r .tmp_versions
-	rm  .`basename $(obj-m) .o`.*
-	rm `basename $(obj-m) .o`.o
-	rm `basename $(obj-m) .o`.ko
-	rm `basename $(obj-m) .o`.mod.*
+    rm -rf $(BUILD_DIR)
