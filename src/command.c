@@ -281,12 +281,17 @@ void cmd_loc(char *args)
         }
 
         printf("-------------\n");
-        printf("Address: %d\n", address);
+        char address_str[4];
+        sprintf(address_str, "%d", address);
+        printf("Address: %s\n", address != -1 ? address_str : "Undefined");
         printf("Alias: %s\n", alias[0] != '\0' ? alias : "Undefined");
-        printf("Direction: %d\n", direction);
-        printf("Light: %d\n", light);
-        printf("Speed: %d\n", speed);
+        printf("Direction: %s\n", direction != -1 ? (direction == 1 ? "Forward" : "Backward") : "Undefined");
+        printf("Light: %s\n", light != -1 ? (light == 1 ? "on" : "off") : "Undefined");
+        char speed_str[3];
+        sprintf(speed_str, "%d", speed);
+        printf("Speed: %s\n", speed != -1 ? speed_str : "Undefined");
         printf("-------------\n");
+
         // TODO: Call corresponding functions
     }
     else
@@ -422,11 +427,16 @@ void cmd_mag(char *args)
         }
 
         printf("-------------\n");
-        printf("Address: %d\n", address);
+        char address_str[4];
+        sprintf(address_str, "%d", address);
+        printf("Address: %s\n", address != -1 ? address_str : "Undefined");
         printf("Alias: %s\n", alias[0] != '\0' ? alias : "Undefined");
-        printf("Device: %d\n", device);
-        printf("Switch: %d\n", switch_state);
+        char device_str[3];
+        sprintf(device_str, "%d", device + 1);
+        printf("Device: %s\n", device != -1 ? device_str : "Undefined");
+        printf("Switch: %s\n", switch_state != -1 ? (switch_state == 1 ? "on" : "off") : "Undefined");
         printf("-------------\n");
+
         // TODO: Call corresponding functions
     }
     else
