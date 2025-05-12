@@ -21,6 +21,7 @@ int msg_count = 1;
 static void send_bit_task(uint64_t message, int length)
 {
   outb(0x00, LPT1); // set start voltlevel
+  rt_sleep(nano2count(1000000)); // wait 1ms
   int i;
   rt_mutex_lock(&bit_mutex);
   for (i = 0; i < length; i++)
