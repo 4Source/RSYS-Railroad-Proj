@@ -13,8 +13,8 @@ BUILD_DIR := $(PWD)/build
 EXTRA_CFLAGS := -I/usr/realtime/include -I/usr/src/linux/include -I$(SRC_DIR)/include
 
 default:
-    mkdir -p $(BUILD_DIR)
-    $(MAKE) -C $(KDIR) M=$(SRC_DIR) O=$(BUILD_DIR) modules
+	mkdir -p $(BUILD_DIR)
+	$(MAKE) -C $(KDIR) M=$(SRC_DIR) O=$(BUILD_DIR) modules
 
 clean:
-    rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR)
