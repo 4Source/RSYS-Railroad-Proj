@@ -292,7 +292,7 @@ void cmd_loc(char *args)
         printf("Speed: %s\n", speed != -1 ? speed_str : "Undefined");
         printf("-------------\n");
 
-        // TODO: Call corresponding functions
+        // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
     }
     else
     {
@@ -437,7 +437,7 @@ void cmd_mag(char *args)
         printf("Switch: %s\n", switch_state != -1 ? (switch_state == 1 ? "on" : "off") : "Undefined");
         printf("-------------\n");
 
-        // TODO: Call corresponding functions
+        // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
     }
     else
     {
