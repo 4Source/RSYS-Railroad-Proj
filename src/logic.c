@@ -27,16 +27,16 @@ static void send_bit_task(uint64_t message, int length)
   {
     if (((message >> (63 - i)) & 0x01) == 1)
     {
-      outb(0x00, LPT1);
+      outb(0x11, LPT1);
       rt_sleep(nano2count(BIT_1_TIME));
-      outb(0xFF, LPT1);
+      outb(0x00, LPT1);
       rt_sleep(nano2count(BIT_1_TIME));
     }
     else
     {
-      outb(0x00, LPT1);
+      outb(0x11, LPT1);
       rt_sleep(nano2count(BIT_0_TIME));
-      outb(0xFF, LPT1);
+      outb(0x00, LPT1);
       rt_sleep(nano2count(BIT_0_TIME));
     }
   }
@@ -48,11 +48,15 @@ static void send_msg_task(long n)
   int i = 0;
   while (1)
   {
+    outb(0x00, LPT1);
+
     if (i >= 0 && i < msg_count)
     {
       // TODO: buildTelegram() to create message from data object
       send_bit_task(msg_queue[i], length);
     }
+
+    outb(0x11, LPT1);
     rt_task_wait_period();
     i++;
     if (i >= msg_count)
