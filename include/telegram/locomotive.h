@@ -17,8 +17,8 @@
 typedef struct
 {
     uint16_t speed : 4;     // [bit 0 - 3]    Speed of the locomotive. Values: 0 - 15 (0xF).
-    uint16_t light : 1;     // [bit 4]        Indicates if the light is on. Values: 0, 1.
-    uint16_t direction : 1; // [bit 5]        Direction of the locomotive. Values: 0, 1.
+    uint16_t light : 1;     // [bit 4]        Indicates if the light is on. Values: 0 (off), 1 (on).
+    uint16_t direction : 1; // [bit 5]        Direction of the locomotive. Values: 0 (backwards), 1 (forwards).
     uint16_t address : 7;   // [bit 6 - 12]   Address of the locomotive. Values: 0 - 127 (0x7F).
     uint16_t reserved : 3;  // [bit 13 - 15]  Reserved for future use.
 } LocomotiveData;
