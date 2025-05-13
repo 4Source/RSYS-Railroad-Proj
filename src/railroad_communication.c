@@ -4,6 +4,7 @@
 #include <rtai_sem.h>
 
 #include "locomotive.h"
+#include "magnetic.h"
 
 #define BIT_1_TIME 58000  /* 58 microseconds*/
 #define BIT_0_TIME 100000 /* 100 microsecdons*/
@@ -17,7 +18,8 @@ RT_TASK msg_periodic_task;
 
 uint64_t message = 0xFFFC066230C00000; // 0x5555555555555555;
 int length = 42;
-LocomotiveData msg_queue[] = {{.address = 00000011, .light = 1, .direction = 1, .speed = 110}}; // 0b111111111111110000000110011111110011111001<<22
+LocomotiveData locomotive_msg_queue[] = {{.address = 00000011, .light = 1, .direction = 1, .speed = 110}}; // 0b111111111111110000000110011111110011111001<<22
+MagneticData magnetic_msg_queue[] = {}
 int msg_count = 1;
 
 static void send_bit_task(uint64_t message, int length)
