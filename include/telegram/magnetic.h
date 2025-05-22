@@ -20,7 +20,7 @@ typedef struct
     uint16_t device : 2;   // [bit 1 - 2]    Device type identifier. Values: 0 - 3.
     uint16_t control : 1;  // [bit 3]        Control status of the device. Values: 0, 1.
     uint16_t address : 9;  // [bit 4 - 12]   9-bit address of the device. Values: 0 - 511 (0x1FF).
-    uint16_t reserved : 3; // [bit 13 - 15]  Reserved for future use.
+    uint16_t reserved : 3; // [bit 13 - 15]  Reserved for future use. // TODO: Maybe use for type and acknowledge
 } MagneticData;
 
 /**

@@ -293,6 +293,7 @@ void cmd_loc(char *args)
         printf("-------------\n");
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
+        // Send not changes instead send uint16_t rtai side needs to check if there is a matching object to the address
     }
     else
     {

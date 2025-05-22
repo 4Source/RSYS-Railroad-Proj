@@ -2,6 +2,7 @@
 #include <rtai.h>
 #include <rtai_sched.h>
 #include <rtai_sem.h>
+#include <rtai_fifos.h>
 
 #define BIT_1_TIME 58000  /* 58 microseconds*/
 #define BIT_0_TIME 100000 /* 100 microsecdons*/

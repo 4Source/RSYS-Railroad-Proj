@@ -20,7 +20,7 @@ typedef struct
     uint16_t light : 1;     // [bit 4]        Indicates if the light is on. Values: 0, 1.
     uint16_t direction : 1; // [bit 5]        Direction of the locomotive. Values: 0, 1.
     uint16_t address : 7;   // [bit 6 - 12]   Address of the locomotive. Values: 0 - 127 (0x7F).
-    uint16_t reserved : 3;  // [bit 13 - 15]  Reserved for future use.
+    uint16_t reserved : 3;  // [bit 13 - 15]  Reserved for future use. // TODO: Maybe use for type and acknowledge
 } LocomotiveData;
 
 /**
