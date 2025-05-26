@@ -12,7 +12,8 @@
  * - light (1 bit): Indicating whether the locomotive's light is on (0 or 1).
  * - direction (1 bit): Specifying the direction of the locomotive (0 or 1).
  * - address (7 bits): Representing the address of the locomotive (0 to 127).
- * - reserved (3 bits): Reserved for future use.
+ * - type (2 bits): Type of data (01 = Locomotive, 10 = Magnetic).
+ * - ack (1 bit): Acknowledge flag (0 = not acknowledged, 1 = acknowledged).
  */
 typedef struct
 {
@@ -20,7 +21,8 @@ typedef struct
     uint16_t light : 1;     // [bit 4]        Indicates if the light is on. Values: 0 (off), 1 (on).
     uint16_t direction : 1; // [bit 5]        Direction of the locomotive. Values: 0 (backwards), 1 (forwards).
     uint16_t address : 7;   // [bit 6 - 12]   Address of the locomotive. Values: 0 - 127 (0x7F).
-    uint16_t reserved : 3;  // [bit 13 - 15]  Reserved for future use.
+    uint16_t type : 2;      // [bit 13 - 14]  Type of data: 01 (Locomotive), 10 (Magnetic)
+    uint16_t ack : 1;       // [bit 15]       Acknowledge: 0 (not), 1 (ack)
 } LocomotiveData;
 
 /**

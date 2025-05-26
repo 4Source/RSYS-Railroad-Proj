@@ -12,7 +12,8 @@
  * - device (2 bits): Specifying the device type (0 to 3).
  * - control (1 bit): Control status (0 or 1).
  * - address (9 bits): Representing the address (0 to 511).
- * - reserved (3 bits): Reserved for future use.
+ * - type (2 bits): Type of data (01 = Locomotive, 10 = Magnetic).
+ * - ack (1 bit): Acknowledge flag (0 = not acknowledged, 1 = acknowledged).
  */
 typedef struct
 {
@@ -20,7 +21,8 @@ typedef struct
     uint16_t device : 2;   // [bit 1 - 2]    Device type identifier. Values: 0 - 3 (devices 1 - 4).
     uint16_t control : 1;  // [bit 3]        Control status of the device. Values: 0 (off), 1 (on).
     uint16_t address : 9;  // [bit 4 - 12]   9-bit address of the device. Values: 0 - 511 (0x1FF).
-    uint16_t reserved : 3; // [bit 13 - 15]  Reserved for future use.
+    uint16_t type : 2;      // [bit 13 - 14]  Type of data: 01 (Locomotive), 10 (Magnetic)
+    uint16_t ack : 1;       // [bit 15]       Acknowledge: 0 (not), 1 (ack)
 } MagneticData;
 
 /**

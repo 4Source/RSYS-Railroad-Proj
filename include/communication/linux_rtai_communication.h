@@ -1,0 +1,5 @@
+#ifndef LINUX_RTAI_COMMUNICATION_H
+#define LINUX_RTAI_COMMUNICATION_H
+
+
+#endif
