@@ -1,33 +1,10 @@
-CC := gcc
-# Set the name of the kernel module
-obj-m	:= logic.o
-# logic-y := src/telegram/idle.o src/telegram/locomotive.o src/telegram/magnetic.o src/telegram/reset.o
+build_all: rtai_main interface_main
 
-# Get the kernel modules path for current version
-KDIR	:= /lib/modules/$(shell uname -r)/build
-# Get the path of the current directory and store it
-PWD	:= $(shell pwd)
-# The path to the scr directory
-SRC_DIR := $(PWD)/src
-# The path to the build directory
-BUILD_DIR := $(PWD)/build
-# Flags to give to the compiler
-CFLAGS := -I/usr/realtime/include -I/usr/src/linux/include -I$(PWD)/include
-# Flags to give to the linker
-#LDFLAGS := 
+rtai_main:
+	$(MAKE) -C src rtai_main
 
-# Make all 
-# all: rtai_main # command
-
-# Make rtai kernel module
-rtai_main: logic.c
-	$(MAKE) -C $(KDIR) M=$(SRC_DIR) MO=$(BUILD_DIR) modules
-
-# Make user interface program
-# command: command.c
-# 	gcc -c command.c
+interface_main:
+	$(MAKE) -C src interface_main
 
 clean:
-	$(MAKE) -C $(KDIR) M=$(SRC_DIR) MO=$(BUILD_DIR) clean
-
-
+	$(MAKE) -C src clean
