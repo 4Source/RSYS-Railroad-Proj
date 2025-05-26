@@ -1,7 +1,7 @@
 CC := gcc
 # Set the name of the kernel module
 obj-m	:= logic.o
-logic-y := src/telegram/idle.o src/telegram/locomotive.o src/telegram/magnetic.o src/telegram/reset.o
+# logic-y := src/telegram/idle.o src/telegram/locomotive.o src/telegram/magnetic.o src/telegram/reset.o
 
 # Get the kernel modules path for current version
 KDIR	:= /lib/modules/$(shell uname -r)/build
@@ -17,10 +17,10 @@ CFLAGS := -I/usr/realtime/include -I/usr/src/linux/include -I$(PWD)/include
 #LDFLAGS := 
 
 # Make all 
-all: rtai # command
+# all: rtai_main # command
 
 # Make rtai kernel module
-rtai: logic.c
+rtai_main: logic.c
 	$(MAKE) -C $(KDIR) M=$(SRC_DIR) MO=$(BUILD_DIR) modules
 
 # Make user interface program
