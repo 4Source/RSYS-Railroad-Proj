@@ -20,7 +20,7 @@ typedef struct
     uint16_t light : 1;     // [bit 4]        Indicates if the light is on. Values: 0, 1.
     uint16_t direction : 1; // [bit 5]        Direction of the locomotive. Values: 0, 1.
     uint16_t address : 7;   // [bit 6 - 12]   Address of the locomotive. Values: 0 - 127 (0x7F).
-    uint16_t reserved : 3;  // [bit 13 - 15]  Reserved for future use. // TODO: Maybe use for type and acknowledge
+    uint16_t reserved : 3;  // [bit 13 - 15]  Reserved for future use.
 } LocomotiveData;
 
 /**
@@ -35,7 +35,6 @@ typedef struct
 {
     LocomotiveData data; // A LocomotiveData structure holding the locomotive data.
     char alias[20];      // A character array with a fixed length of 20 for the alias name.
-    // semaphore data_lock; // TODO: Is it a good idea to add a semaphore to the structure which get locked during changes and allows multible to read
 } Locomotive;
 
 /**

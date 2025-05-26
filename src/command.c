@@ -3,11 +3,12 @@
 #include <stdlib.h>
 
 #include "command.h"
+#include "config.h"
 
 #define CMD_CNT 5
 Command commands[] = {
     {"loc", cmd_loc, "Usage: loc (--address <address> | --alias <alias>) [OPTION]...\n", "Description: Gives access to the configuration for locomotives.\n", "Options:\n  -a <address>, --address <address>                                            Select the address of the locomotive which should be changed. Address range is 0 to 127.\n  -A <alias>, --alias <alias>                                                  Select the alias of the locomotive which should be changed. Is internally resolved to the address which is configured for this alias. The length of alias is limited to 20 characters.\n  -d (forward | backward), --direction (forward | backward)                    Set the direction in which the locomotive should drive.\n  -h, --help                                                                   Show this screen.\n  -l (on|off), --light (on|off)                                                Enable or disable the light of the locomotive.\n  --list                                                                       List the available locomotives.\n  -m, --monitor                                                                Shows the current configuration of the locomotive.\n  -s <stop | e-stop | 0-15>, --speed <stop | e-stop | 0-15>                    Set the speed the locomotive should drive.\n"},
-    {"mag", cmd_mag, "Usage: mag (--address <address> | --alias <alias>) --device <device> [OPTION]...\n", "Description: Gives access to the configuration for magnetic accessories.\n", "Options:\n  -a <address>, --address <address>                                            Select the address of the accessory which should be changed. Address range is 0 to 511.\n  -A <alias>, --alias <alias>                                                  Select the alias of the accessory which should be changed. Is internally resolved to the address which is configured for this alias. The length of alias is limited to 20 characters.\n  -d <device>, --device <device>                                               Select the device (1-4) which which should be changed.\n  -s (on|off), --switch (on|off)                                               Enable or disable the switch.\n"},
+    {"mag", cmd_mag, "Usage: mag (--address <address> --device <device> | --alias <alias>) [OPTION]...\n", "Description: Gives access to the configuration for magnetic accessories.\n", "Options:\n  -a <address>, --address <address>                                            Select the address of the accessory which should be changed. Address range is 0 to 511.\n  -A <alias>, --alias <alias>                                                  Select the alias of the accessory which should be changed. Is internally resolved to the address which is configured for this alias. The length of alias is limited to 20 characters.\n  -d <device>, --device <device>                                               Select the device (1-4) which which should be changed.\n  --list                                                                       List the available magnetics.\n  -m, --monitor                                                                Shows the current configuration of the magnetic.\n  -s (on|off), --switch (on|off)                                               Enable or disable the switch.\n"},
     {"restore", cmd_restore, "Usage: restore [digital]\n", "Description: Restores the digital mode. Use this command if the system has switched to an alternative mode (analog mode).\n", ""},
     {"help", cmd_help, "Usage: help\n       help <command>\n", "Description: Show this help or used with <command> --help.\n", ""},
     {"exit", NULL, "Usage: exit\n", "Description: Terminates the current prompt. Also sends a reset message to all decoders.\n", ""},
@@ -188,7 +189,7 @@ void cmd_loc(char *args)
         }
         else if (strcmp(option, "-l") == 0 || strcmp(option, "--light") == 0)
         {
-            // Get the value for the direction
+            // Get the value for the light
             char *value = strtok(NULL, " ");
             if (value != NULL)
             {
@@ -214,7 +215,7 @@ void cmd_loc(char *args)
         }
         else if (strcmp(option, "-s") == 0 || strcmp(option, "--speed") == 0)
         {
-            // Get the value for the direction
+            // Get the value for the speed
             char *value = strtok(NULL, " ");
             if (value != NULL)
             {
@@ -241,12 +242,16 @@ void cmd_loc(char *args)
         else if (strcmp(option, "-m") == 0 || strcmp(option, "--monitor") == 0)
         {
             monitor = 1;
-            return;
         }
         else if (strcmp(option, "--list") == 0)
         {
-            // TODO: List the available locomotives
+            // List the available locomotives
+            size_t num_locomotives = sizeof(locomotives_user) / sizeof(locomotives_user[0]);
             printf("Locomotives:\n");
+            for (size_t i = 0; i < num_locomotives; i++)
+            {
+                printf("\taddress: %d (%s) - direction: %d, light: %d, speed: %d\n", locomotives_user[i].data.address, locomotives_user[i].alias, locomotives_user[i].data.direction, locomotives_user[i].data.light, locomotives_user[i].data.speed);
+            }
             return;
         }
         else
@@ -268,29 +273,72 @@ void cmd_loc(char *args)
     // Check if address or alias is set
     if (address >= 0 || alias[0] != '\0')
     {
-        if (address < 0 && alias[0] != '\0')
+        Locomotive loc = {
+            .alias = "",
+            .data = {
+                .address = 0,
+                .direction = 0,
+                .light = 0,
+                .speed = 0,
+                .reserved = 0,
+            }};
+
+        size_t num_locomotives = sizeof(locomotives_user) / sizeof(locomotives_user[0]);
+        for (int i = 0; i < num_locomotives; i++)
         {
-            // TODO: Resolve address from alias
+            if (address == locomotives_user[i].data.address || (alias[0] != '\0' && strcmp(alias, locomotives_user[i].alias) == 0))
+            {
+                if (alias[0] == '\0')
+                {
+                    strcpy(loc.alias, locomotives_user[i].alias);
+                }
+                else
+                {
+                    strcpy(loc.alias, alias);
+                }
+                if (address < 0)
+                {
+                    loc.data.address = locomotives_user[i].data.address;
+                }
+                else
+                {
+                    loc.data.address = address;
+                }
+                if (direction < 0)
+                {
+                    loc.data.direction = locomotives_user[i].data.direction;
+                }
+                else
+                {
+                    loc.data.direction = direction;
+                    locomotives_user[i].data.direction = direction;
+                }
+                if (light < 0)
+                {
+                    loc.data.light = locomotives_user[i].data.light;
+                }
+                else
+                {
+                    loc.data.light = light;
+                    locomotives_user[i].data.light = light;
+                }
+                if (speed < 0)
+                {
+                    loc.data.speed = locomotives_user[i].data.speed;
+                }
+                else
+                {
+                    loc.data.speed = speed;
+                    locomotives_user[i].data.speed = speed;
+                }
+                break;
+            }
         }
 
         if (monitor)
         {
-            // TODO: Read the values from current state
-            printf("%s (%s) - dir: %d, light: %d, speed: %d\n", address, alias, direction, light, speed);
-            return;
+            printf("address: %d (%s) - direction: %d, light: %d, speed: %d\n", loc.data.address, loc.alias, loc.data.direction, loc.data.light, loc.data.speed);
         }
-
-        printf("-------------\n");
-        char address_str[4];
-        sprintf(address_str, "%d", address);
-        printf("Address: %s\n", address != -1 ? address_str : "Undefined");
-        printf("Alias: %s\n", alias[0] != '\0' ? alias : "Undefined");
-        printf("Direction: %s\n", direction != -1 ? (direction == 1 ? "Forward" : "Backward") : "Undefined");
-        printf("Light: %s\n", light != -1 ? (light == 1 ? "on" : "off") : "Undefined");
-        char speed_str[3];
-        sprintf(speed_str, "%d", speed);
-        printf("Speed: %s\n", speed != -1 ? speed_str : "Undefined");
-        printf("-------------\n");
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
         // Send not changes instead send uint16_t rtai side needs to check if there is a matching object to the address
@@ -316,7 +364,8 @@ void cmd_mag(char *args)
     int address = -1;
     char alias[20] = "";
     int device = -1;
-    int switch_state = -1;
+    int control = -1;
+    int monitor = 0;
 
     // Tokenize the arguments
     char *option = strtok(args, " ");
@@ -360,7 +409,7 @@ void cmd_mag(char *args)
         }
         else if (strcmp(option, "-d") == 0 || strcmp(option, "--device") == 0)
         {
-            // Get the value for the direction
+            // Get the value for the device
             char *value = strtok(NULL, " ");
             if (value != NULL)
             {
@@ -379,17 +428,17 @@ void cmd_mag(char *args)
         }
         else if (strcmp(option, "-s") == 0 || strcmp(option, "--switch") == 0)
         {
-            // Get the value for the direction
+            // Get the value for the switch
             char *value = strtok(NULL, " ");
             if (value != NULL)
             {
                 if (strcmp(value, "on") == 0)
                 {
-                    switch_state = 1;
+                    control = 1;
                 }
                 else if (strcmp(value, "off") == 0)
                 {
-                    switch_state = 0;
+                    control = 0;
                 }
                 else
                 {
@@ -402,6 +451,21 @@ void cmd_mag(char *args)
                 printf("Missing argument for switch\n");
                 options_valid = 0;
             }
+        }
+        else if (strcmp(option, "-m") == 0 || strcmp(option, "--monitor") == 0)
+        {
+            monitor = 1;
+        }
+        else if (strcmp(option, "--list") == 0)
+        {
+            // List the available locomotives
+            size_t num_magnetics = sizeof(magnetic_user) / sizeof(magnetic_user[0]);
+            printf("Magnetics:\n");
+            for (size_t i = 0; i < num_magnetics; i++)
+            {
+                printf("\taddress: %d (%s) - device: %d, control: %d, enable: %d\n", magnetic_user[i].data.address, magnetic_user[i].alias, magnetic_user[i].data.device, magnetic_user[i].data.control, magnetic_user[i].data.enable);
+            }
+            return;
         }
         else
         {
@@ -420,23 +484,67 @@ void cmd_mag(char *args)
     }
 
     // Check if address or alias is set
-    if (address >= 0 || alias[0] != '\0')
+    if ((address >= 0 && device >= 0) || alias[0] != '\0')
     {
-        if (address < 0 && alias[0] != '\0')
+        Magnetic mag = {
+            .alias = "",
+            .data = {
+                .address = 0,
+                .control = 0,
+                .device = 0,
+                .enable = 0,
+                .reserved = 0,
+            }};
+
+        size_t num_magnetics = sizeof(magnetic_user) / sizeof(magnetic_user[0]);
+        for (int i = 0; i < num_magnetics; i++)
         {
-            // TODO: Resolve address from alias
+            if (address == magnetic_user[i].data.address || (alias[0] != '\0' && strcmp(alias, magnetic_user[i].alias) == 0))
+            {
+                if (alias[0] == '\0')
+                {
+                    strcpy(mag.alias, magnetic_user[i].alias);
+                }
+                else
+                {
+                    strcpy(mag.alias, alias);
+                }
+                if (address < 0)
+                {
+                    mag.data.address = magnetic_user[i].data.address;
+                }
+                else
+                {
+                    mag.data.address = address;
+                }
+                if (control < 0)
+                {
+                    mag.data.control = magnetic_user[i].data.control;
+                }
+                else
+                {
+                    mag.data.control = control;
+                    magnetic_user[i].data.control = control;
+                }
+                if (device < 0)
+                {
+                    mag.data.device = magnetic_user[i].data.device;
+                }
+                else
+                {
+                    mag.data.device = device;
+                    magnetic_user[i].data.device = device;
+                }
+
+                mag.data.enable = magnetic_user[i].data.enable;
+                break;
+            }
         }
 
-        printf("-------------\n");
-        char address_str[4];
-        sprintf(address_str, "%d", address);
-        printf("Address: %s\n", address != -1 ? address_str : "Undefined");
-        printf("Alias: %s\n", alias[0] != '\0' ? alias : "Undefined");
-        char device_str[3];
-        sprintf(device_str, "%d", device + 1);
-        printf("Device: %s\n", device != -1 ? device_str : "Undefined");
-        printf("Switch: %s\n", switch_state != -1 ? (switch_state == 1 ? "on" : "off") : "Undefined");
-        printf("-------------\n");
+        if (monitor)
+        {
+            printf("address: %d (%s) - device: %d, control: %d, enable: %d\n", mag.data.address, mag.alias, mag.data.device, mag.data.control, mag.data.enable);
+        }
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
     }

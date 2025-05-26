@@ -2,19 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "magnetic.h"
-#include "locomotive.h"
 #include "command.h"
-
-int locomotives_user_size = 1;
-Locomotive locomotives_user[] = {{.alias = "loc3",
-                                  .data = {
-                                      .address = 3,
-                                      .direction = 1,
-                                      .light = 1,
-                                      .speed = 0,
-                                  }}};
-// TODO: Maybe use config.h instead of json parser
 
 int main()
 {

@@ -1,4 +1,4 @@
-#include "locomotive.h"
+#include "telegram/locomotive.h"
 
 LocomotiveTelegram buildLocomotiveTelegram(LocomotiveData data)
 {

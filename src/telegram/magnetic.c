@@ -1,4 +1,4 @@
-#include "magnetic.h"
+#include "telegram/magnetic.h"
 
 MagneticTelegram buildMagneticTelegram(MagneticData data)
 {

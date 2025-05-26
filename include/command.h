@@ -27,6 +27,4 @@ void cmd_mag(char *args);
 void cmd_restore(char *args);
 void cmd_help(char *args);
 
-void send_with_ack();
-
 #endif

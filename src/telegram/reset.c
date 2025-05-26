@@ -1,4 +1,4 @@
-#include "reset.h"
+#include "telegram/reset.h"
 
 ResetAllTelegram buildResetAllTelegram()
 {

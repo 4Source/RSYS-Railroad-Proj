@@ -25,7 +25,7 @@ Options:
   -s <stop | e-stop | 0-15>, --speed <stop | e-stop | 0-15>                    Set the speed the locomotive should drive. 
 ```
 ```
-Usage: mag (--address <address> | --alias <alias>) --device <device> [OPTION]...
+Usage: mag (--address <address> --device <device> | --alias <alias>) [OPTION]...
 
 Description: Gives access to the configuration for magnetic accessories.
 
@@ -33,6 +33,8 @@ Options:
   -a <address>, --address <address>                                            Select the address of the accessory which should be changed. Address range is 0 to 511.
   -A <alias>, --alias <alias>                                                  Select the alias of the accessory which should be changed. Is internally resolved to the address which is configured for this alias. The length of alias is limited to 20 characters.
   -d <device>, --device <device>                                               Select the device (1-4) which which should be changed.
+  --list                                                                       List the available magnetics.
+  -m, --monitor                                                                Shows the current configuration of the magnetic.
   -s (on|off), --switch (on|off)                                               Enable or disable the switch.
 ```
 ```
