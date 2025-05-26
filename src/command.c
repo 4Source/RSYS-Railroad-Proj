@@ -149,6 +149,7 @@ void cmd_loc(char *args)
             char *value = strtok(NULL, " ");
             if (value != NULL)
             {
+                // Only allow alphanumeric aliases
                 if (sscanf(value, "%[A-Z,a-z,0-9]s", &alias) != 1)
                 {
                     printf("Invalid argument '%s' for alias\n", value);
@@ -273,6 +274,7 @@ void cmd_loc(char *args)
     // Check if address or alias is set
     if (address >= 0 || alias[0] != '\0')
     {
+        // Prepare a temporary Locomotive struct to hold the updated values
         Locomotive loc = {
             .alias = "",
             .data = {
@@ -286,8 +288,10 @@ void cmd_loc(char *args)
         size_t num_locomotives = sizeof(locomotives_user) / sizeof(locomotives_user[0]);
         for (int i = 0; i < num_locomotives; i++)
         {
+            // Find the matching locomotive by address or alias
             if (address == locomotives_user[i].data.address || (alias[0] != '\0' && strcmp(alias, locomotives_user[i].alias) == 0))
             {
+                // If alias was not set, copy from found locomotive
                 if (alias[0] == '\0')
                 {
                     strcpy(loc.alias, locomotives_user[i].alias);
@@ -296,6 +300,7 @@ void cmd_loc(char *args)
                 {
                     strcpy(loc.alias, alias);
                 }
+                // If address was not set, copy from found locomotive
                 if (address < 0)
                 {
                     loc.data.address = locomotives_user[i].data.address;
@@ -304,6 +309,7 @@ void cmd_loc(char *args)
                 {
                     loc.data.address = address;
                 }
+                // If direction were not set, use existing values, otherwise update
                 if (direction < 0)
                 {
                     loc.data.direction = locomotives_user[i].data.direction;
@@ -313,6 +319,7 @@ void cmd_loc(char *args)
                     loc.data.direction = direction;
                     locomotives_user[i].data.direction = direction;
                 }
+                // If light were not set, use existing values, otherwise update
                 if (light < 0)
                 {
                     loc.data.light = locomotives_user[i].data.light;
@@ -322,6 +329,7 @@ void cmd_loc(char *args)
                     loc.data.light = light;
                     locomotives_user[i].data.light = light;
                 }
+                // If speed were not set, use existing values, otherwise update
                 if (speed < 0)
                 {
                     loc.data.speed = locomotives_user[i].data.speed;
@@ -345,6 +353,7 @@ void cmd_loc(char *args)
     }
     else
     {
+        // If neither address nor alias is set, print usage
         for (int i = 0; i < CMD_CNT; i++)
         {
             if (strcmp(cmd_name, commands[i].name) == 0)
@@ -395,6 +404,7 @@ void cmd_mag(char *args)
             char *value = strtok(NULL, " ");
             if (value != NULL)
             {
+                // Only allow alphanumeric aliases
                 if (sscanf(value, "%[A-Z,a-z,0-9]s", &alias) != 1)
                 {
                     printf("Invalid argument '%s' for alias\n", value);
@@ -413,6 +423,7 @@ void cmd_mag(char *args)
             char *value = strtok(NULL, " ");
             if (value != NULL)
             {
+                // Device must be in range 1-4, but is stored as 0-3
                 if (sscanf(value, "%d", &device) != 1 || device > 4 || device < 1)
                 {
                     printf("Invalid argument '%s' for device\n", value);
@@ -458,7 +469,7 @@ void cmd_mag(char *args)
         }
         else if (strcmp(option, "--list") == 0)
         {
-            // List the available locomotives
+            // List the available magnetics
             size_t num_magnetics = sizeof(magnetic_user) / sizeof(magnetic_user[0]);
             printf("Magnetics:\n");
             for (size_t i = 0; i < num_magnetics; i++)
@@ -483,9 +494,10 @@ void cmd_mag(char *args)
         return;
     }
 
-    // Check if address or alias is set
+    // Check if address/device or alias is set
     if ((address >= 0 && device >= 0) || alias[0] != '\0')
     {
+        // Prepare a temporary Magnetic struct to hold the updated values
         Magnetic mag = {
             .alias = "",
             .data = {
@@ -499,8 +511,10 @@ void cmd_mag(char *args)
         size_t num_magnetics = sizeof(magnetic_user) / sizeof(magnetic_user[0]);
         for (int i = 0; i < num_magnetics; i++)
         {
+            // Find the matching magnetic by address or alias
             if (address == magnetic_user[i].data.address || (alias[0] != '\0' && strcmp(alias, magnetic_user[i].alias) == 0))
             {
+                // If alias was not set, copy from found magnetic
                 if (alias[0] == '\0')
                 {
                     strcpy(mag.alias, magnetic_user[i].alias);
@@ -509,6 +523,7 @@ void cmd_mag(char *args)
                 {
                     strcpy(mag.alias, alias);
                 }
+                // If address was not set, copy from found magnetic
                 if (address < 0)
                 {
                     mag.data.address = magnetic_user[i].data.address;
@@ -517,6 +532,7 @@ void cmd_mag(char *args)
                 {
                     mag.data.address = address;
                 }
+                // If control were not set, use existing values, otherwise update
                 if (control < 0)
                 {
                     mag.data.control = magnetic_user[i].data.control;
@@ -526,6 +542,7 @@ void cmd_mag(char *args)
                     mag.data.control = control;
                     magnetic_user[i].data.control = control;
                 }
+                // If device were not set, use existing values, otherwise update
                 if (device < 0)
                 {
                     mag.data.device = magnetic_user[i].data.device;
@@ -550,6 +567,7 @@ void cmd_mag(char *args)
     }
     else
     {
+        // If neither address/device nor alias is set, print usage
         for (int i = 0; i < CMD_CNT; i++)
         {
             if (strcmp(cmd_name, commands[i].name) == 0)
