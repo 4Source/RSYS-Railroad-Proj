@@ -36,6 +36,8 @@ static __exit void send_exit(void)
   for (int i = 0; i < NUM_LOCOMOTIVES; i++) {
     rt_task_delete(&loco_tasks[i]);
   } 
+  rtf_destroy(FIFO_CMD);
+  rtf_destroy(FIFO_ACK);
   rt_mutex_delete(&bit_mutex);
 
   rt_umount();
