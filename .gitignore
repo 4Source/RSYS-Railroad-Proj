@@ -1,4 +1,11 @@
 *.exe
 *.ko
+*.o
+*.cmd
+*.swp
+*.symvers
+*.order
+*.mod.c
+
 /.vscode
-/build
+/src/.tmp_versions

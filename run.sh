@@ -30,3 +30,5 @@ echo "Inserting the newly built module: $MODULE_NAME"
 sudo insmod "./build/$MODULE_NAME.ko" 
 
 echo "Running..."
+
+./src/dcc

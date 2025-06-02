@@ -5,10 +5,7 @@
 
 int main()
 {
-    while (1)
-    {
-        
-    }
+    printf("Rsys Proj");
 
     return 0;
 }
