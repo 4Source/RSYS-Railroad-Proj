@@ -21,7 +21,9 @@ int fifo_handler(unsigned int fifo)
             LocomotiveData loco = *(LocomotiveData*)&raw;
 
             if (loco.address < 4 && loco.address >= 0) {
+                rt_mutex_lock(locomotive_data_mutex[loco.address-1]);
                 locomotive_msg_queue[loco.address-1] = loco;
+                rt_mutex_unlock(locomotive_data_mutex[loco.address-1]);
                 printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n",loco.address, loco.speed, loco.direction, loco.light);
                 send_ack(raw);
             } else {
@@ -32,7 +34,10 @@ int fifo_handler(unsigned int fifo)
             MagneticData mag = *(MagneticData*)&raw;
 
             if (magnetic_msg_count < 4) {
-                magnetic_msg_queue[magnetic_msg_count++].command = raw;
+                rt_mutex_lock(magnetic_data_mutex[magnetic_msg_count]);
+                magnetic_msg_queue[magnetic_msg_count].command = mag;
+                rt_mutex_unlock(magnetic_data_mutex[magnetic_msg_count]);
+                magnetic_msg_count++;
                 printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n",mag.address, mag.device, mag.enable, mag.control);
                 send_ack(raw)
                     if (!rt_task_alive(&magnetic_task)) {

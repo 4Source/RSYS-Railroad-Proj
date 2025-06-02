@@ -33,7 +33,9 @@ static void send_bit_task(uint64_t message, int length)
 static void send_magnetic_msg_task(long arg) {
 
 if (magnetic_msg_count > 0) {
+        rt_mutex_lock(magnetic_data_mutex[0]);
         MagneticTelegram telegram = buildMagneticTelegram(magnetic_msg_queue[0]);
+        rt_mutex_unlock(magnetic_data_mutex[0]);
         send_bit_task(telegram, length);
 
         // Nachrücken
@@ -54,10 +56,10 @@ static void send_loco_msg_task(long i)
 
     if (i >= 0 && i < locomotive_count)
     {
-      rt_mutex_lock(&bit_mutex);
+      rt_mutex_lock(locomotive_data_mutex[i]);
       LocomotiveTelegram telegram = buildLocomotiveTelegram(locomotive_msg_queue[i]);
+      rt_mutex_unlock(locomotive_data_mutex[i]);
       send_bit_task(telegram, length);
-      rt_mutex_unlock(&bit_mutex);
     }
 
     outb(0x11, LPT1);
