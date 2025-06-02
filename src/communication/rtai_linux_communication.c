@@ -1,7 +1,8 @@
 #include "communication/rtai_linux_communication.h"
+#include <rtai_fifos.h>
 #include "communication/railroad_communication.h"
-#include <string.h>
-#include "typed.h"
+#include <types.h>
+ 
 
 int fifo_handler(unsigned int fifo)
 {
