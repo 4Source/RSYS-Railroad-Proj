@@ -4,7 +4,7 @@
 #include <rtai.h>
 #include <rtai_sched.h>
 #include <rtai_sem.h>
-#include "typed.h"
+#include "types.h"
 
 #include "telegram/locomotive.h"
 #include "telegram/magnetic.h"

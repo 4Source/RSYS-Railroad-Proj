@@ -9,5 +9,4 @@
 int fifo_handler(unsigned int fifo);
 void send_ack(uint16_t raw);
 
-
 #endif

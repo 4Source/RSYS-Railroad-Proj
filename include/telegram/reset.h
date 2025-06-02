@@ -1,7 +1,7 @@
 #ifndef RESET_H
 #define RESET_H
 
-#include "typed.h"
+#include "types.h"
 
 /**
  * @struct ResetAllTelegram

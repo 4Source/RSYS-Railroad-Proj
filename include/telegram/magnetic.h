@@ -1,7 +1,7 @@
 #ifndef MAGNETIC_H
 #define MAGNETIC_H
 
-#include "typed.h"
+#include "types.h"
 
 /**
  * @struct MagneticData
