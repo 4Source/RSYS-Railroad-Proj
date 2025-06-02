@@ -1,5 +1,3 @@
-#include "telegram/locomotive.h"
-#include "telegram/magnetic.h"
 #include "communication/railroad_communication.h"
 
 
