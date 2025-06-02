@@ -3,11 +3,6 @@
 #include <string.h>
 #include <stdint.h>
  
-// größe array speichern und belegte größe
-// auf letzte freie zeigen (wenn index = 0 dann leer)
-// Funktion von Fifo einlesen und in queue speichern (Übung 5 fifo handler)
-// bitmaske für adressen, dementsprechen in locomotive oder magnetic queue legen
-//  locomotive queue hat vorher festgelegte indizes für die jeweilige adresse
 
 int fifo_handler(unsigned int fifo)
 {
@@ -27,8 +22,8 @@ int fifo_handler(unsigned int fifo)
 
             if (loco.address < 4 && loco.address >= 0) {
                 locomotive_msg_queue[loco.address-1] = loco;
-                printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n",
-                       loco.address, loco.speed, loco.direction, loco.light);
+                printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n",loco.address, loco.speed, loco.direction, loco.light);
+                send_ack(raw);
             } else {
                 printk("Ungültige Lok-Adresse: %d\n", loco.address);
             }
@@ -38,8 +33,8 @@ int fifo_handler(unsigned int fifo)
 
             if (magnetic_msg_count < 4) {
                 magnetic_msg_queue[magnetic_msg_count++].command = raw;
-                printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n",
-                       mag.address, mag.device, mag.enable, mag.control);
+                printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n",mag.address, mag.device, mag.enable, mag.control);
+                send_ack(raw)
                     if (!rt_task_alive(&magnetic_task)) {
                         rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 1, 0, 0);
                     }
@@ -50,14 +45,26 @@ int fifo_handler(unsigned int fifo)
         } else {
             printk("Unbekannter Nachrichtentyp: %d\n", type);
         }
-
-        // Optional: ACK senden
-        // uint8_t ack = 0xA5;
-        // rtf_put(ACK_FIFO, &ack, sizeof(ack));
-
     } else {
         printk("Ungültige FIFO-Daten (nur %d Byte)\n", r);
     }
 
     return 0;
+}
+
+void send_ack(uint16_t raw)
+{
+    // Prüfe den Typ anhand der Bits 13–14
+    uint16_t type = (raw >> 13) & 0x3;
+
+    // Setze Bit 15 (ACK-Bit)
+    raw |= (1 << 15);
+
+    int result = rtf_put(FIFO_ACK, &raw, sizeof(raw));
+
+    if (result != sizeof(raw)) {
+        printk("ACK konnte nicht gesendet werden (Typ=%d)\n", type);
+    } else {
+        printk("ACK gesendet (Typ=%d, Raw=0x%04x)\n", type, raw);
+    }
 }

@@ -1,10 +1,15 @@
 #include <linux/module.h>
+#include "rtai_linux_communication.h"
 
 #define STACK_SIZE 4096
 
 static __init int send_init(void)
 {
   rt_mount();
+
+  rtf_create(FIFO_CMD, 1024);
+  rtf_create_handler(FIFO_CMD, &fifo_handler);
+  rtf_create(FIFO_ACK, 1024);
 
   rt_mutex_init(&bit_mutex);
   rt_task_init(&msg_periodic_task, send_msg_task, 0, STACK_SIZE, 1, 0, 0);
