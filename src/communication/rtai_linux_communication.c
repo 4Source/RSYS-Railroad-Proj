@@ -54,17 +54,12 @@ int fifo_handler(unsigned int fifo)
 
 void send_ack(uint16_t raw)
 {
-    // Prüfe den Typ anhand der Bits 13–14
-    uint16_t type = (raw >> 13) & 0x3;
-
     // Setze Bit 15 (ACK-Bit)
     raw |= (1 << 15);
 
     int result = rtf_put(FIFO_ACK, &raw, sizeof(raw));
 
     if (result != sizeof(raw)) {
-        printk("ACK konnte nicht gesendet werden (Typ=%d)\n", type);
-    } else {
-        printk("ACK gesendet (Typ=%d, Raw=0x%04x)\n", type, raw);
+        printk("ACK konnte nicht gesendet werden.\n");
     }
 }
