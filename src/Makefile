@@ -1,4 +1,13 @@
 CC := gcc
+# Get the path of the current directory and store it
+PWD	:= $(shell pwd)/..
+# The path to the scr directory
+SRC_DIR := $(PWD)/src
+# The path to the build directory
+BUILD_DIR := $(PWD)/build
+# The path to the include directory
+INCLUDE_DIR := $(PWD)/include
+
 # Set the name of the kernel module
 obj-m	:= rtai_main.o
 rtai_main-y := $(SRC_DIR)/rtai_main.o
