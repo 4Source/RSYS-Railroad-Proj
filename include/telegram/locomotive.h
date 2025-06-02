@@ -1,7 +1,7 @@
 #ifndef LOCOMOTIVE_H
 #define LOCOMOTIVE_H
 
-#include <stdint.h>
+#include "typed.h"
 
 /**
  * @struct LocomotiveData

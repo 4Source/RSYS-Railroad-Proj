@@ -1,7 +1,7 @@
 #ifndef MAGNETIC_H
 #define MAGNETIC_H
 
-#include <stdint.h>
+#include "typed.h"
 
 /**
  * @struct MagneticData
@@ -17,12 +17,12 @@
  */
 typedef struct
 {
-    uint16_t enable : 1;   // [bit 0]        Enables or disables the magnetic device. Values: 0 (off), 1 (on).
-    uint16_t device : 2;   // [bit 1 - 2]    Device type identifier. Values: 0 - 3 (devices 1 - 4).
-    uint16_t control : 1;  // [bit 3]        Control status of the device. Values: 0 (off), 1 (on).
-    uint16_t address : 9;  // [bit 4 - 12]   9-bit address of the device. Values: 0 - 511 (0x1FF).
-    uint16_t type : 2;      // [bit 13 - 14]  Type of data: 01 (Locomotive), 10 (Magnetic)
-    uint16_t ack : 1;       // [bit 15]       Acknowledge: 0 (not), 1 (ack)
+    uint16_t enable : 1;  // [bit 0]        Enables or disables the magnetic device. Values: 0 (off), 1 (on).
+    uint16_t device : 2;  // [bit 1 - 2]    Device type identifier. Values: 0 - 3 (devices 1 - 4).
+    uint16_t control : 1; // [bit 3]        Control status of the device. Values: 0 (off), 1 (on).
+    uint16_t address : 9; // [bit 4 - 12]   9-bit address of the device. Values: 0 - 511 (0x1FF).
+    uint16_t type : 2;    // [bit 13 - 14]  Type of data: 01 (Locomotive), 10 (Magnetic)
+    uint16_t ack : 1;     // [bit 15]       Acknowledge: 0 (not), 1 (ack)
 } MagneticData;
 
 /**

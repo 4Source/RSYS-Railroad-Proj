@@ -1,7 +1,7 @@
 #ifndef IDLE_H
 #define IDLE_H
 
-#include <stdint.h>
+#include "typed.h"
 
 /**
  * @struct IdleTelegram

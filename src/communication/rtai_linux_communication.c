@@ -1,8 +1,7 @@
 #include "communication/rtai_linux_communication.h"
 #include "communication/railroad_communication.h"
 #include <string.h>
-#include <stdint.h>
- 
+#include "typed.h"
 
 int fifo_handler(unsigned int fifo)
 {
@@ -11,46 +10,59 @@ int fifo_handler(unsigned int fifo)
     uint16_t raw;
 
     r = rtf_get(fifo, command, sizeof(command) - 1);
-    if (r >= sizeof(uint16_t)) {
+    if (r >= sizeof(uint16_t))
+    {
         memcpy(&raw, command, sizeof(uint16_t));
 
         // Typ prüfen (bitweise: Bit 13-14)
         uint16_t type = (raw >> 13) & 0x3;
 
-        if (type == 0x1) {  // Locomotive
-            LocomotiveData loco = *(LocomotiveData*)&raw;
+        if (type == 0x1)
+        { // Locomotive
+            LocomotiveData loco = *(LocomotiveData *)&raw;
 
-            if (loco.address < 4 && loco.address >= 0) {
-                rt_mutex_lock(locomotive_data_mutex[loco.address-1]);
-                locomotive_msg_queue[loco.address-1] = loco;
-                rt_mutex_unlock(locomotive_data_mutex[loco.address-1]);
-                printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n",loco.address, loco.speed, loco.direction, loco.light);
+            if (loco.address < 4 && loco.address >= 0)
+            {
+                rt_mutex_lock(locomotive_data_mutex[loco.address - 1]);
+                locomotive_msg_queue[loco.address - 1] = loco;
+                rt_mutex_unlock(locomotive_data_mutex[loco.address - 1]);
+                printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n", loco.address, loco.speed, loco.direction, loco.light);
                 send_ack(raw);
-            } else {
+            }
+            else
+            {
                 printk("Ungültige Lok-Adresse: %d\n", loco.address);
             }
+        }
+        else if (type == 0x2)
+        { // Magnetic
+            MagneticData mag = *(MagneticData *)&raw;
 
-        } else if (type == 0x2) {  // Magnetic
-            MagneticData mag = *(MagneticData*)&raw;
-
-            if (magnetic_msg_count < 4) {
+            if (magnetic_msg_count < 4)
+            {
                 rt_mutex_lock(magnetic_data_mutex[magnetic_msg_count]);
                 magnetic_msg_queue[magnetic_msg_count].command = mag;
                 rt_mutex_unlock(magnetic_data_mutex[magnetic_msg_count]);
                 magnetic_msg_count++;
-                printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n",mag.address, mag.device, mag.enable, mag.control);
-                send_ack(raw)
-                    if (!rt_task_alive(&magnetic_task)) {
-                        rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 1, 0, 0);
-                    }
-            rt_task_resume(&magnetic_task);
-            } else {
+                printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
+                send_ack(raw) if (!rt_task_alive(&magnetic_task))
+                {
+                    rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 1, 0, 0);
+                }
+                rt_task_resume(&magnetic_task);
+            }
+            else
+            {
                 printk("Magnetic queue voll!\n");
             }
-        } else {
+        }
+        else
+        {
             printk("Unbekannter Nachrichtentyp: %d\n", type);
         }
-    } else {
+    }
+    else
+    {
         printk("Ungültige FIFO-Daten (nur %d Byte)\n", r);
     }
 
@@ -64,7 +76,8 @@ void send_ack(uint16_t raw)
 
     int result = rtf_put(FIFO_ACK, &raw, sizeof(raw));
 
-    if (result != sizeof(raw)) {
+    if (result != sizeof(raw))
+    {
         printk("ACK konnte nicht gesendet werden.\n");
     }
 }
