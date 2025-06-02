@@ -1,5 +1,5 @@
-#include "rtai_linux_communication.h"
-#include "railroad_communication.h"
+#include "communication/rtai_linux_communication.h"
+#include "communication/railroad_communication.h"
 #include <string.h>
 #include <stdint.h>
  

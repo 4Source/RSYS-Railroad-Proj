@@ -1,5 +1,5 @@
 #include <linux/module.h>
-#include "rtai_linux_communication.h"
+#include "communication/rtai_linux_communication.h"
 
 #define STACK_SIZE 4096
 #define FIFO_SIZE 1024

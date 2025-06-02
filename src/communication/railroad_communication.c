@@ -1,6 +1,6 @@
-#include "locomotive.h"
-#include "magnetic.h"
-#include "railroad_communication.h"
+#include "telegram/locomotive.h"
+#include "telegram/magnetic.h"
+#include "communication/railroad_communication.h"
 
 
 static void send_bit_task(uint64_t message, int length)
