@@ -3,9 +3,8 @@
 
 #include "railroad_communication.h"
 
-#define FIFO_CMD
-#define FIFO_ACK 
-#define ACK_BYTE 0xA5
+#define FIFO_CMD 3
+#define FIFO_ACK 4
 
 int fifo_handler(unsigned int fifo);
 void send_ack(uint16_t raw)
