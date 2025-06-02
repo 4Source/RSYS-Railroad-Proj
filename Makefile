@@ -10,10 +10,10 @@ INCLUDE_DIR := $(PWD)/include
 build_all: rtai_main interface_main
 
 rtai_main:
-	$(MAKE) -C src rtai_main
+	$(MAKE) -C src rtai_main PWD=$(PWD) SRC_DIR=$(SRC_DIR) BUILD_DIR=$(BUILD_DIR) INCLUDE_DIR=$(INCLUDE_DIR)
 
 interface_main:
-	$(MAKE) -C src interface_main
+	$(MAKE) -C src interface_main PWD=$(PWD) SRC_DIR=$(SRC_DIR) BUILD_DIR=$(BUILD_DIR) INCLUDE_DIR=$(INCLUDE_DIR)
 
 clean:
 	$(MAKE) -C src clean

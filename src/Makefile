@@ -15,7 +15,7 @@ ccflags-y += -I$(INCLUDE_DIR)
 KDIR	:= /lib/modules/$(shell uname -r)/build
 
 # Make rtai kernel module
-rtai_main: logic.c
+rtai_main: rtai_main.c
 	$(MAKE) -C $(KDIR) M=$(SRC_DIR) modules
 
 # Make user interface program
