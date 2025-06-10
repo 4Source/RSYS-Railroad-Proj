@@ -116,7 +116,13 @@ void cmd_loc(char *args)
     int options_valid = 1;
 
     int address = -1;
-    char alias[20] = "";
+    char *alias = malloc(20 * sizeof(char));
+    if (alias == NULL)
+    {
+        perror("Allocation error");
+        exit(EXIT_FAILURE);
+    }
+    alias[0] = '\0';
     int direction = -1;
     int light = -1;
     int speed = -1;
@@ -151,7 +157,7 @@ void cmd_loc(char *args)
             if (value != NULL)
             {
                 // Only allow alphanumeric aliases
-                if (sscanf(value, "%[A-Z,a-z,0-9]s", &alias) != 1)
+                if (sscanf(value, "%[A-Z,a-z,0-9]s", alias) != 1)
                 {
                     printf("Invalid argument '%s' for alias\n", value);
                     options_valid = 0;
