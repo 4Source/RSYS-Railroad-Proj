@@ -13,7 +13,7 @@ int send_with_ack(unsigned short data, int attempts)
     if (fd_cmd < 0)
     {
         // If the command FIFO can't be opened, log the error
-        printf("Failed to open command fifo!");
+        printf("Failed to open command fifo!\n");
         return -1;
     }
 

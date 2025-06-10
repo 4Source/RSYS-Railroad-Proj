@@ -26,7 +26,7 @@ unsigned long long message = 0xFFFC066230C00000; // 0x5555555555555555;
 int length = 42;
 const int locomotive_count = 3;
 int magnetic_msg_count = 0;
-LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {}; // 0b111111111111110000000110011111110011111001<<22 | {.address = 00000011, .light = 1, .direction = 1, .speed = 110}
+LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {{.address = 00000011, .light = 1, .direction = 1, .speed = 110}};
 MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {};
 static int loco_sent_count = 0; // Zählt gesendete Lokomotiv-Telegramme
 

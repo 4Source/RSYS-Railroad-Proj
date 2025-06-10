@@ -13,7 +13,7 @@ int fifo_handler(unsigned int fifo)
     int r;
     unsigned short raw;
 
-    r = rtf_get(fifo, command, sizeof(command) - 1);
+    r = rtf_get(FIFO_CMD, command, sizeof(command) - 1);
     if (r >= sizeof(unsigned short))
     {
         memcpy(&raw, command, sizeof(unsigned short));
