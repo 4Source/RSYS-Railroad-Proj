@@ -10,15 +10,15 @@ int fifo_handler(unsigned int fifo)
 {
     char command[1024];
     int r;
-    uint16_t raw;
+    unsigned short raw;
 
     r = rtf_get(fifo, command, sizeof(command) - 1);
-    if (r >= sizeof(uint16_t))
+    if (r >= sizeof(unsigned short))
     {
-        memcpy(&raw, command, sizeof(uint16_t));
+        memcpy(&raw, command, sizeof(unsigned short));
 
         // Typ prüfen (bitweise: Bit 13-14)
-        uint16_t type = (raw >> 13) & 0x3;
+        unsigned short type = (raw >> 13) & 0x3;
 
         if (type == 0x1)
         { // Locomotive
@@ -72,7 +72,7 @@ int fifo_handler(unsigned int fifo)
     return 0;
 }
 
-void send_ack(uint16_t raw)
+void send_ack(unsigned short raw)
 {
     // Setze Bit 15 (ACK-Bit)
     raw |= (1 << 15);

@@ -7,6 +7,6 @@
 #define FIFO_ACK 4
 
 int fifo_handler(unsigned int fifo);
-void send_ack(uint16_t raw);
+void send_ack(unsigned short raw);
 
 #endif

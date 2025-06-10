@@ -3,7 +3,7 @@
 MagneticTelegram buildMagneticTelegram(MagneticData data)
 {
     // Extract the high bits of the address and invert them (bits 8 - 6 of the address)
-    uint16_t address_high = ~((data.address >> 6) & 0b111);
+    unsigned short address_high = ~((data.address >> 6) & 0b111);
 
     // Extract the low bits of the address (bits 5 - 0 of the address)
     uint8_t address_low = (data.address & 0b111111);

@@ -21,7 +21,7 @@ static SEM mag_sem[MAG_MSQ_SIZE];
 RT_TASK loco_tasks[LOC_MSQ_SIZE];
 RT_TASK magnetic_task;
 
-uint64_t message = 0xFFFC066230C00000; // 0x5555555555555555;
+unsigned long long message = 0xFFFC066230C00000; // 0x5555555555555555;
 int length = 42;
 const int locomotive_count = 3;
 int magnetic_msg_count = 0;
@@ -29,7 +29,7 @@ LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {}; // 0b1111111111111100000
 MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {};
 static int loco_sent_count = 0; // Zählt gesendete Lokomotiv-Telegramme
 
-static void send_bit_task(uint64_t message, int length);
+static void send_bit_task(unsigned long long message, int length);
 
 static void send_magnetic_msg_task(long arg);
 

@@ -17,12 +17,12 @@
  */
 typedef struct
 {
-    uint16_t speed : 4;     // [bit 0 - 3]    Speed of the locomotive. Values: 0 - 15 (0xF).
-    uint16_t light : 1;     // [bit 4]        Indicates if the light is on. Values: 0 (off), 1 (on).
-    uint16_t direction : 1; // [bit 5]        Direction of the locomotive. Values: 0 (backwards), 1 (forwards).
-    uint16_t address : 7;   // [bit 6 - 12]   Address of the locomotive. Values: 0 - 127 (0x7F).
-    uint16_t type : 2;      // [bit 13 - 14]  Type of data: 01 (Locomotive), 10 (Magnetic)
-    uint16_t ack : 1;       // [bit 15]       Acknowledge: 0 (not), 1 (ack)
+    unsigned short speed : 4;     // [bit 0 - 3]    Speed of the locomotive. Values: 0 - 15 (0xF).
+    unsigned short light : 1;     // [bit 4]        Indicates if the light is on. Values: 0 (off), 1 (on).
+    unsigned short direction : 1; // [bit 5]        Direction of the locomotive. Values: 0 (backwards), 1 (forwards).
+    unsigned short address : 7;   // [bit 6 - 12]   Address of the locomotive. Values: 0 - 127 (0x7F).
+    unsigned short type : 2;      // [bit 13 - 14]  Type of data: 01 (Locomotive), 10 (Magnetic)
+    unsigned short ack : 1;       // [bit 15]       Acknowledge: 0 (not), 1 (ack)
 } LocomotiveData;
 
 /**
@@ -62,19 +62,19 @@ typedef struct
  */
 typedef struct
 {
-    uint64_t reserved : 22;         // [bit 0 - 21]     Reserved for future use.
-    uint64_t stop_bit : 1;          // [bit 22]         Stop bit of the telegram. Fixed value: 1.
-    uint64_t checksum : 8;          // [bit 23 - 30]    An 8-bit field for the checksum value.
-    uint64_t start_bit_cs : 1;      // [bit 31]         Start bit for the checksum field. Fixed value: 0.
-    uint64_t speed : 4;             // [bit 32 - 35]    Speed of the locomotive. Values: 0 - 15 (0xF).
-    uint64_t light : 1;             // [bit 36]         Indicates if the light is on. Values: 0, 1.
-    uint64_t direction : 1;         // [bit 37]         Direction of the locomotive. Values: 0, 1.
-    uint64_t cmd_bits_7_6 : 2;      // [bit 38 - 39]    Command bits 7 and 6. Values: 0 - 3.
-    uint64_t start_bit_cmd : 1;     // [bit 40]         Start bit for the command field. Fixed value: 0.
-    uint64_t address : 7;           // [bit 41 - 47]    Address of the locomotive. Values: 0 - 127 (0x7F).
-    uint64_t address_bit_7 : 1;     // [bit 48]         7th bit of the address. Values: 0, 1.
-    uint64_t start_bit_address : 1; // [bit 49]         Start bit for the address field. Fixed value: 0.
-    uint64_t preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
+    unsigned long long reserved : 22;         // [bit 0 - 21]     Reserved for future use.
+    unsigned long long stop_bit : 1;          // [bit 22]         Stop bit of the telegram. Fixed value: 1.
+    unsigned long long checksum : 8;          // [bit 23 - 30]    An 8-bit field for the checksum value.
+    unsigned long long start_bit_cs : 1;      // [bit 31]         Start bit for the checksum field. Fixed value: 0.
+    unsigned long long speed : 4;             // [bit 32 - 35]    Speed of the locomotive. Values: 0 - 15 (0xF).
+    unsigned long long light : 1;             // [bit 36]         Indicates if the light is on. Values: 0, 1.
+    unsigned long long direction : 1;         // [bit 37]         Direction of the locomotive. Values: 0, 1.
+    unsigned long long cmd_bits_7_6 : 2;      // [bit 38 - 39]    Command bits 7 and 6. Values: 0 - 3.
+    unsigned long long start_bit_cmd : 1;     // [bit 40]         Start bit for the command field. Fixed value: 0.
+    unsigned long long address : 7;           // [bit 41 - 47]    Address of the locomotive. Values: 0 - 127 (0x7F).
+    unsigned long long address_bit_7 : 1;     // [bit 48]         7th bit of the address. Values: 0, 1.
+    unsigned long long start_bit_address : 1; // [bit 49]         Start bit for the address field. Fixed value: 0.
+    unsigned long long preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
 } LocomotiveTelegram;
 
 /**
