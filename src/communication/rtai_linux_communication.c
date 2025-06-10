@@ -27,9 +27,9 @@ int fifo_handler(unsigned int fifo)
 
             if (loco.address < 4 && loco.address >= 0)
             {
-                rt_mutex_lock(&loc_sem[loco.address - 1]);
+                rt_sem_wait(&loc_sem[loco.address - 1]);
                 locomotive_msg_queue[loco.address - 1] = loco;
-                rt_mutex_unlock(&loc_sem[loco.address - 1]);
+                rt_sem_signal(&loc_sem[loco.address - 1]);
                 printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n", loco.address, loco.speed, loco.direction, loco.light);
                 send_ack(raw);
             }
@@ -45,9 +45,9 @@ int fifo_handler(unsigned int fifo)
             if (magnetic_msg_count < 4)
             //TODO: override existing
             {
-                rt_mutex_lock(&mag_sem[magnetic_msg_count]);
+                rt_sem_wait(&mag_sem[magnetic_msg_count]);
                 magnetic_msg_queue[magnetic_msg_count] = mag;
-                rt_mutex_unlock(&mag_sem[magnetic_msg_count]);
+                rt_sem_signal(&mag_sem[magnetic_msg_count]);
                 magnetic_msg_count++;
                 printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
                 send_ack(raw); 
