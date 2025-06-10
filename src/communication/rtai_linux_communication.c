@@ -45,11 +45,11 @@ int fifo_handler(unsigned int fifo)
                 rt_mutex_unlock(magnetic_data_mutex[magnetic_msg_count]);
                 magnetic_msg_count++;
                 printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
-                send_ack(raw) if (!rt_task_alive(&magnetic_task))
+                send_ack(raw); 
+                if (!rt_task_alive(&magnetic_task))
                 {
                     rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 1, 0, 0);
                 }
-                rt_task_resume(&magnetic_task);
             }
             else
             {

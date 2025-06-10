@@ -14,6 +14,12 @@ static __init int send_init(void)
   rtf_create(FIFO_ACK, FIFO_SIZE);
 
   rt_mutex_init(&bit_mutex);
+  for (int i = 0; i < LOC_MSQ_SIZE; i++) {
+    rt_mutex_init(&loc_sem[i]);
+  }
+  for (int i = 0; i < MAG_MSQ_SIZE; i++) {
+    rt_mutex_init(&mag_sem[i]);
+  }
   rt_task_init(&msg_periodic_task, send_msg_task, 0, STACK_SIZE, 1, 0, 0);
 
   rt_set_periodic_mode();
@@ -23,8 +29,6 @@ static __init int send_init(void)
     rt_task_init(&loco_tasks[i], send_loco_msg_task, i, STACK_SIZE, 1, 0, 0)
     rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(1000000000 + i * 1000000), nano2count(60000000));
   }
-
-  rt_task_init(&magnetic_task, rt_get_time() + nano2count(1000000000), nano2count(20000000));
   
   rt_printk("Module loaded\n");
 
@@ -41,6 +45,14 @@ static __exit void send_exit(void)
   rtf_destroy(FIFO_CMD);
   rtf_destroy(FIFO_ACK);
   rt_mutex_delete(&bit_mutex);
+
+  for (int i = 0; i < LOC_MSQ_SIZE; i++) {
+    rt_mutex_delete(&loc_sem[i]);
+  }
+  for (int i = 0; i < MAG_MSQ_SIZE; i++) {
+    rt_mutex_delete(&mag_sem[i]);
+  }
+
 
   rt_umount();
   rt_printk("Unloading module\n");
