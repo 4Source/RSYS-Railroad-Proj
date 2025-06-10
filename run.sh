@@ -27,7 +27,6 @@ for (( idx=${#MODULE_NAME[@]}-1; idx>=0; idx-- )); do
         echo "No old module to remove."
     fi
 done
-done
 
 for MODULE in "${MODULE_NAME[@]}"; do
     # Insert the newly built module
