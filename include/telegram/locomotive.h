@@ -85,9 +85,16 @@ typedef struct
  */
 unsigned long long buildLocomotiveTelegram(LocomotiveData data);
 
-typedef union LocomotiveConverter {
+typedef union LocomotiveConverter
+{
     LocomotiveTelegram lt;
     unsigned long long ull;
-}LocomotiveConverter;
+} LocomotiveConverter;
+
+typedef union LocomotiveDataConverter
+{
+    LocomotiveData ld;
+    unsigned short us;
+} LocomotiveDataConverter;
 
 #endif

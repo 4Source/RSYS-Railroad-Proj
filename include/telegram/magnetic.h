@@ -87,10 +87,16 @@ typedef struct
  */
 unsigned long long buildMagneticTelegram(MagneticData data);
 
-
-typedef union MagneticConverter {
+typedef union MagneticConverter
+{
     MagneticTelegram mt;
     unsigned long long ull;
-}MagneticConverter;
+} MagneticConverter;
+
+typedef union MagneticDataConverter
+{
+    MagneticData md;
+    unsigned short us;
+} MagneticDataConverter;
 
 #endif

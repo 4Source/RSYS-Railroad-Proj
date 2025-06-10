@@ -358,7 +358,9 @@ void cmd_loc(char *args)
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
         // Send not changes instead send unsigned short rtai side needs to check if there is a matching object to the address
-        send_with_ack(loc.data, 3);
+        LocomotiveDataConverter converter;
+        converter.ld = loc.data;
+        send_with_ack(converter.us, 3);
     }
     else
     {
@@ -574,7 +576,9 @@ void cmd_mag(char *args)
         }
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
-        send_with_ack(mag.data, 3);
+        MagneticDataConverter converter;
+        converter.md = mag.data;
+        send_with_ack(converter.us, 3);
     }
     else
     {
