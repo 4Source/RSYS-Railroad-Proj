@@ -1,10 +1,12 @@
 #include <linux/module.h>
-
+#include <rtai_fifos.h>
 #include "communication/railroad_communication.h"
 #include "communication/rtai_linux_communication.h"
-
 #define STACK_SIZE 4096
 #define FIFO_SIZE 1024
+#define PERIOD_TIMER 20000000
+#define PERIOD_MAG_TASK 70000000
+#define PERIOD_LOC_TASK 60000000
 
 static __init int send_init(void)
 {
@@ -22,14 +24,14 @@ static __init int send_init(void)
   for (i = 0; i < MAG_MSQ_SIZE; i++) {
     rt_mutex_init(&mag_sem[i]);
   }
-  rt_task_init(&msg_periodic_task, send_msg_task, 0, STACK_SIZE, 1, 0, 0);
-
   rt_set_periodic_mode();
-  start_rt_timer(nano2count(20000000));
+  start_rt_timer(nano2count(PERIOD_TIMER));
+  rt_task_init(magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
+  rt_task_make_periodic(magnetic_task, rt_get_time() + nano2count(1000000000),  nano2count(PERIOD_MAG_TASK));
 
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < LOC_MSQ_SIZE; i++) {
     rt_task_init(&loco_tasks[i], send_loco_msg_task, i, STACK_SIZE, 1, 0, 0)
-    rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(1000000000 + i * 1000000), nano2count(60000000));
+    rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(1000000000), nano2count(PERIOD_LOC_TASK + i));
   }
   
   rt_printk("Module loaded\n");
@@ -41,9 +43,11 @@ static __exit void send_exit(void)
 {
   stop_rt_timer();
   int i;
-  for (i = 0; i < NUM_LOCOMOTIVES; i++) {
+  for (i = 0; i < LOC_MSQ_SIZE; i++) {
     rt_task_delete(&loco_tasks[i]);
   } 
+
+  rt_task_delete(magnetic_task);
   rtf_destroy(FIFO_CMD);
   rtf_destroy(FIFO_ACK);
   rt_mutex_delete(&bit_mutex);

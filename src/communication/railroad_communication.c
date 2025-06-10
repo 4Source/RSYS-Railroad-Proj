@@ -42,9 +42,6 @@ if (magnetic_msg_count > 0) {
         }
         magnetic_msg_count--;
     }
-    if (rt_task_delete(magnetic_task) == 0) { //One-Shot Task beenden
-      magnetic_task = NULL;
-    }
 }
 
 

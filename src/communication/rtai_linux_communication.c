@@ -43,6 +43,7 @@ int fifo_handler(unsigned int fifo)
             MagneticData mag = *(MagneticData *)&raw;
 
             if (magnetic_msg_count < 4)
+            //TODO: override existing
             {
                 rt_mutex_lock(&mag_sem[magnetic_msg_count]);
                 magnetic_msg_queue[magnetic_msg_count] = mag;
@@ -50,10 +51,6 @@ int fifo_handler(unsigned int fifo)
                 magnetic_msg_count++;
                 printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
                 send_ack(raw); 
-                if (magnetic_task == NULL)
-                {
-                    rt_task_init(magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 1, 0, 0);
-                }
             }
             else
             {
