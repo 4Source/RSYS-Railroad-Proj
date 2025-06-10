@@ -1,4 +1,4 @@
-build_all: rtai_main interface_main
+build_all: rtai_module interface_main
 
 rtai_module:
 	$(MAKE) -C src rtai_module
