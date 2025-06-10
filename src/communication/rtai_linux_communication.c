@@ -82,3 +82,5 @@ void send_ack(unsigned short raw)
         printk("ACK konnte nicht gesendet werden.\n");
     }
 }
+
+EXPORT_SYMBOL(fifo_handler);

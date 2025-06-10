@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check for required kernel modules
-REQUIRED_MODULES=("rtai" "rtai_sched" "rtai_sem")
+REQUIRED_MODULES=("rtai_hal" "rtai_sched" "rtai_sem" "rtai_fifos")
 
 for MODULE in "${REQUIRED_MODULES[@]}"; do
     if ! lsmod | grep "$MODULE" &> /dev/null; then
@@ -17,7 +17,7 @@ echo "Building the module..."
 make
 
 # Remove old module if present
-MODULE_NAME="logic"
+MODULE_NAME="rtai_main"
 if lsmod | grep "$MODULE_NAME" &> /dev/null; then
     echo "Removing old module: $MODULE_NAME"
     sudo rmmod "$MODULE_NAME"
@@ -27,7 +27,7 @@ fi
 
 # Insert the newly built module
 echo "Inserting the newly built module: $MODULE_NAME"
-sudo insmod "./build/$MODULE_NAME.ko" 
+sudo insmod "./src/$MODULE_NAME.ko" 
 
 echo "Running..."
 

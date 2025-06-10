@@ -64,4 +64,5 @@ static void send_loco_msg_task(long i)
   }
 }
 
-
+EXPORT_SYMBOL(send_magnetic_msg_task);
+EXPORT_SYMBOL(send_loco_msg_task);
