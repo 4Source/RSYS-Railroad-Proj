@@ -1,4 +1,4 @@
-#include "communication/linux_rtai_communicatin.h"
+#include "communication/linux_rtai_communication.h"
 
 #include <fcntl.h>
 #include <unistd.h>

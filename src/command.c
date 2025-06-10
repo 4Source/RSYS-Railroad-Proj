@@ -4,7 +4,7 @@
 
 #include "command.h"
 #include "config.h"
-#include "communication/linux_rtai_communicatin.h"
+#include "communication/linux_rtai_communication.h"
 
 #define CMD_CNT 5
 Command commands[] = {
