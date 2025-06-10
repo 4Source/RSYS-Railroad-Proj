@@ -44,7 +44,7 @@ int fifo_handler(unsigned int fifo)
             if (magnetic_msg_count < 4)
             {
                 rt_mutex_lock(&mag_sem[magnetic_msg_count]);
-                magnetic_msg_queue[magnetic_msg_count]->command = mag;
+                magnetic_msg_queue[magnetic_msg_count] = mag;
                 rt_mutex_unlock(&mag_sem[magnetic_msg_count]);
                 magnetic_msg_count++;
                 printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
