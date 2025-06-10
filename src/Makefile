@@ -14,7 +14,6 @@ obj-m	:= rtai_main.o
 rtai_main-y := rtai_main.o
 rtai_main-y += communication/rtai_linux_communication.o
 rtai_main-y += communication/railroad_communication.o
-rtai_main-y += communication/railroad_communication.o
 rtai_main-y += telegram/locomotive.o
 rtai_main-y += telegram/magnetic.o
 # Flags to give to the compiler
