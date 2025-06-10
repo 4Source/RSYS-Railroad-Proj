@@ -17,17 +17,23 @@ echo "Building the module..."
 make
 
 # Remove old module if present
-MODULE_NAME="rtai_main"
-if lsmod | grep "$MODULE_NAME" &> /dev/null; then
-    echo "Removing old module: $MODULE_NAME"
-    sudo rmmod "$MODULE_NAME"
-else
-    echo "No old module to remove."
-fi
+MODULE_NAME=("railroad_communication" "rtai_linux_communication" "rtai_main")
+for (( idx=${#MODULE_NAME[@]}-1; idx>=0; idx-- )); do
+    MODULE="${MODULE_NAME[idx]}"
+    if lsmod | grep "$MODULE" &> /dev/null; then
+        echo "Removing old module: $MODULE"
+        sudo rmmod "$MODULE"
+    else
+        echo "No old module to remove."
+    fi
+done
+done
 
-# Insert the newly built module
-echo "Inserting the newly built module: $MODULE_NAME"
-sudo insmod "./src/$MODULE_NAME.ko" 
+for MODULE in "${MODULE_NAME[@]}"; do
+    # Insert the newly built module
+    echo "Inserting the newly built module: $MODULE"
+    sudo insmod "./src/$MODULE.ko" 
+done
 
 echo "Running..."
 

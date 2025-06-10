@@ -10,8 +10,9 @@ BUILD_DIR := $(PWD)/build
 INCLUDE_DIR := $(PWD)/include
 
 # Set the name of the kernel module
-obj-m	:= rtai_main.o
-rtai_main-y += communication/rtai_linux_communication.o
+obj-m	:= rtai_main.o railroad_communication.o rtai_linux_communication.o
+railroad_communication-y := communication/railroad_communication.o telegram/locomotive.o telegram/magnetic.o
+rtai_linux_communication-y := communication/rtai_linux_communication.o telegram/locomotive.o telegram/magnetic.o
 
 # Flags to give to the compiler
 ccflags-y := -I/usr/realtime/include -I/usr/src/linux/include 
@@ -21,7 +22,7 @@ ccflags-y += -I$(INCLUDE_DIR)
 KDIR	:= /lib/modules/$(shell uname -r)/build
 
 # Make rtai kernel module
-rtai_main: rtai_main.c communication/rtai_linux_communication.c communication/railroad_communication.c telegram/magnetic.c telegram/locomotive.c 
+rtai_module:
 	$(MAKE) -C $(KDIR) M=$(SRC_DIR) modules
 
 # Make user interface program
