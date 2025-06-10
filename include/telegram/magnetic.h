@@ -88,6 +88,6 @@ typedef struct
  * @param data The MagneticData structure containing the magnetic data.
  * @return A MagneticTelegram structure constructed from the input data.
  */
-MagneticTelegram buildMagneticTelegram(MagneticData data);
+unsigned long long buildMagneticTelegram(MagneticData data);
 
 #endif

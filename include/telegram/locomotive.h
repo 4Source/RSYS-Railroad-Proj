@@ -86,6 +86,6 @@ typedef struct
  * @param data The LocomotiveData structure containing the locomotive data.
  * @return A LocomotiveTelegram structure constructed from the input data.
  */
-LocomotiveTelegram buildLocomotiveTelegram(LocomotiveData data);
+unsigned long long buildLocomotiveTelegram(LocomotiveData data);
 
 #endif

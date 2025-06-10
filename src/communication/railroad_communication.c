@@ -32,7 +32,7 @@ static void send_magnetic_msg_task(long arg) {
 
 if (magnetic_msg_count > 0) {
         rt_mutex_lock(&mag_sem[0]);
-        MagneticTelegram telegram = buildMagneticTelegram(magnetic_msg_queue[0]);
+        unsigned long long telegram = buildMagneticTelegram(magnetic_msg_queue[0]);
         rt_mutex_unlock(&mag_sem[0]);
         send_bit_task(telegram, length);
 
@@ -58,7 +58,7 @@ static void send_loco_msg_task(long i)
     if (i >= 0 && i < locomotive_count)
     {
       rt_mutex_lock(&loc_sem[i]);
-      LocomotiveTelegram telegram = buildLocomotiveTelegram(locomotive_msg_queue[i]);
+      unsigned long long telegram = buildLocomotiveTelegram(locomotive_msg_queue[i]);
       rt_mutex_unlock(&loc_sem[i]);
       send_bit_task(telegram, length);
     }
