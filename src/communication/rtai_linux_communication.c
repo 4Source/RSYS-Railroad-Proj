@@ -49,9 +49,9 @@ int fifo_handler(unsigned int fifo)
                 magnetic_msg_count++;
                 printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
                 send_ack(raw); 
-                if (&magnetic_task == NULL)
+                if (magnetic_task == NULL)
                 {
-                    rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 1, 0, 0);
+                    rt_task_init(magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 1, 0, 0);
                 }
             }
             else
