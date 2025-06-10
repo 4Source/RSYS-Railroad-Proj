@@ -1,4 +1,8 @@
+#include <linux/kernel.h>
 #include <linux/module.h>
+#include <rtai.h>
+#include <rtai_sched.h>
+#include <rtai_sem.h>
 #include <rtai_fifos.h>
 #include "communication/railroad_communication.h"
 #include "communication/rtai_linux_communication.h"
@@ -10,7 +14,7 @@
 
 static __init int send_init(void)
 {
-  rt_mount();
+  rt_mount_rtai();
 
   rt_sem_init(&bit_sem, 1);
   int i;
@@ -71,7 +75,7 @@ static __exit void send_exit(void)
     rt_sem_delete(&mag_sem[i]);
   }
 
-  rt_umount();
+  rt_umount_rtai();
   rt_printk("Unloading module\n");
 }
 
