@@ -6,7 +6,7 @@
 #define FIFO_CMD "dev/rtf3"
 #define FIFO_ACK "dev/rtf4"
 
-int send_with_ack(uint16_t data, int attempts = 3)
+int send_with_ack(uint16_t data, int attempts)
 {
     // Open the command FIFO in write-only mode
     int fd_cmd = open(FIFO_CMD, O_WRONLY);

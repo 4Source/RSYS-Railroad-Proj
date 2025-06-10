@@ -283,7 +283,8 @@ void cmd_loc(char *args)
                 .direction = 0,
                 .light = 0,
                 .speed = 0,
-                .reserved = 0,
+                .type = 0,
+                .ack = 0,
             }};
 
         size_t num_locomotives = sizeof(locomotives_user) / sizeof(locomotives_user[0]);
@@ -351,7 +352,7 @@ void cmd_loc(char *args)
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
         // Send not changes instead send uint16_t rtai side needs to check if there is a matching object to the address
-        send_with_ack(loc.data);
+        send_with_ack(loc.data, 3);
     }
     else
     {
@@ -507,7 +508,8 @@ void cmd_mag(char *args)
                 .control = 0,
                 .device = 0,
                 .enable = 0,
-                .reserved = 0,
+                .type = 0,
+                .ack = 0,
             }};
 
         size_t num_magnetics = sizeof(magnetic_user) / sizeof(magnetic_user[0]);
@@ -566,7 +568,7 @@ void cmd_mag(char *args)
         }
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
-        send_with_ack(mag.data);
+        send_with_ack(mag.data, 3);
     }
     else
     {
