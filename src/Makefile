@@ -25,8 +25,8 @@ rtai_main: rtai_main.c
 	$(MAKE) -C $(KDIR) M=$(SRC_DIR) modules
 
 # Make user interface program
-interface_main: main.c command.c telegram/locomotive.c telegram/magnetic.c communication/rtai_linux_communication.c
-	gcc main.c command.c telegram/locomotive.c telegram/magnetic.c communication/rtai_linux_communication.c -I $(INCLUDE_DIR) -o dcc
+interface_main: main.c command.c telegram/locomotive.c telegram/magnetic.c communication/linux_rtai_communication.c
+	gcc main.c command.c telegram/locomotive.c telegram/magnetic.c communication/linux_rtai_communication.c -I $(INCLUDE_DIR) -o dcc
 	chmod u+x dcc
 
 clean:
