@@ -1,6 +1,5 @@
 #include "communication/rtai_linux_communication.h"
 #include <rtai_fifos.h>
-#include "communication/railroad_communication.h"
 #include "types.h"
 
 #define STACK_SIZE 4096
