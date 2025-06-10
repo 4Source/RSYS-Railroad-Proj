@@ -35,7 +35,6 @@ typedef struct
 {
     MagneticData data; // A MagneticData structure holding the magnetic data.
     char alias[20];    // A character array with a fixed length of 20 for the alias name.
-    // semaphore data_lock; // TODO: Is it a good idea to add a semaphore to the structure which get locked during changes and allows multible to read
 } Magnetic;
 
 /**

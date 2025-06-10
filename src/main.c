@@ -1,11 +1,30 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "telegram/magnetic.h"
 #include "telegram/locomotive.h"
+#include "command.h"
 
 int main()
 {
-    printf("Rsys Proj");
+    int exit;
 
-    return 0;
+    do
+    {
+        char *command = NULL;
+        char *args = NULL;
+
+        if (prompt(&command, &args) != 0)
+        {
+            continue;
+        }
+
+        exit = handle_command(command, args);
+
+        free(command);
+        free(args);
+    } while (exit == 1);
+
+    return exit;
 }
