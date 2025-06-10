@@ -19,7 +19,7 @@ static SEM loc_sem[LOC_MSQ_SIZE];
 static SEM mag_sem[MAG_MSQ_SIZE];
 
 RT_TASK loco_tasks[LOC_MSQ_SIZE];
-RT_TASK* msg_periodic_task
+RT_TASK* msg_periodic_task;
 RT_TASK* magnetic_task = NULL;
 
 unsigned long long message = 0xFFFC066230C00000; // 0x5555555555555555;

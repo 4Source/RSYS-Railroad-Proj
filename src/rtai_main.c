@@ -30,7 +30,7 @@ static __init int send_init(void)
   rt_task_make_periodic(magnetic_task, rt_get_time() + nano2count(1000000000),  nano2count(PERIOD_MAG_TASK));
 
   for (i = 0; i < LOC_MSQ_SIZE; i++) {
-    rt_task_init(&loco_tasks[i], send_loco_msg_task, i, STACK_SIZE, 1, 0, 0)
+    rt_task_init(&loco_tasks[i], send_loco_msg_task, i, STACK_SIZE, 1, 0, 0);
     rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(1000000000), nano2count(PERIOD_LOC_TASK + i));
   }
   
