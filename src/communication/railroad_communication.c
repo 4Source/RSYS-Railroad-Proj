@@ -31,19 +31,20 @@ static void send_bit_task(uint64_t message, int length)
 static void send_magnetic_msg_task(long arg) {
 
 if (magnetic_msg_count > 0) {
-        rt_mutex_lock(mag_sem[0]);
+        rt_mutex_lock(&mag_sem[0]);
         MagneticTelegram telegram = buildMagneticTelegram(magnetic_msg_queue[0]);
-        rt_mutex_unlock(mag_sem[0]);
-        send_bit_task(telegram, length);
+        rt_mutex_unlock(&mag_sem[0]);
+        send_bit_task((uint64_t)telegram, length);
 
         // Nachrücken
-        for (int i = 1; i < magnetic_msg_count; i++) {
+        int i;
+        for (i = 1; i < magnetic_msg_count; i++) {
             magnetic_msg_queue[i - 1] = magnetic_msg_queue[i];
         }
         magnetic_msg_count--;
     }
     if (rt_task_delete(&magnetic_task) == 0) { //One-Shot Task beenden
-      magnetic_task = NULL;
+      magnetic_task* = NULL;
     }
 }
 
@@ -56,10 +57,10 @@ static void send_loco_msg_task(long i)
 
     if (i >= 0 && i < locomotive_count)
     {
-      rt_mutex_lock(loc_sem[i]);
+      rt_mutex_lock(&loc_sem[i]);
       LocomotiveTelegram telegram = buildLocomotiveTelegram(locomotive_msg_queue[i]);
-      rt_mutex_unlock(loc_sem[i]);
-      send_bit_task(telegram, length);
+      rt_mutex_unlock(&loc_sem[i]);
+      send_bit_task((uint64_t)telegram, length);
     }
 
     outb(0x11, LPT1);
