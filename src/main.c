@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "magnetic.h"
-#include "locomotive.h"
+#include "telegram/magnetic.h"
+#include "telegram/locomotive.h"
 
 int main()
 {
