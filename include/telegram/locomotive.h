@@ -1,8 +1,6 @@
 #ifndef LOCOMOTIVE_H
 #define LOCOMOTIVE_H
 
-#include "types.h"
-
 /**
  * @struct LocomotiveData
  * @brief Represents the locomotive data with bit fields for various parameters.

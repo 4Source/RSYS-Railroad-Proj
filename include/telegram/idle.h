@@ -1,8 +1,6 @@
 #ifndef IDLE_H
 #define IDLE_H
 
-#include "types.h"
-
 /**
  * @struct IdleTelegram
  * @brief Represents the structure of a Digital Decoder Idle Packet.

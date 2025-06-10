@@ -1,6 +1,5 @@
 #include "communication/railroad_communication.h"
 
-
 static void send_bit_task(unsigned long long message, int length)
 {
   outb(0x00, LPT1); // set start voltlevel

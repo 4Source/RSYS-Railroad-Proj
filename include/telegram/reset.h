@@ -1,8 +1,6 @@
 #ifndef RESET_H
 #define RESET_H
 
-#include "types.h"
-
 /**
  * @struct ResetAllTelegram
  * @brief Represents the structure of a Digital Decoder Reset Packet.

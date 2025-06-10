@@ -1,8 +1,6 @@
 #ifndef MAGNETIC_H
 #define MAGNETIC_H
 
-#include "types.h"
-
 /**
  * @struct MagneticData
  * @brief Represents the magnetic data with bit fields for various parameters.
