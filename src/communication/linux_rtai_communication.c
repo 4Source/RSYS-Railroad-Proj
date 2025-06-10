@@ -6,7 +6,7 @@
 #define FIFO_CMD "dev/rtf3"
 #define FIFO_ACK "dev/rtf4"
 
-int send_with_ack(uint16_t data, int attempts)
+int send_with_ack(unsigned short data, int attempts)
 {
     // Open the command FIFO in write-only mode
     int fd_cmd = open(FIFO_CMD, O_WRONLY);
@@ -36,7 +36,7 @@ int send_with_ack(uint16_t data, int attempts)
         // Pause briefly (50 milliseconds) to wait for an acknowledgment
         usleep(50000);
 
-        uint16_t ack;
+        unsigned short ack;
         // Try reading the acknowledgment from the FIFO
         if (read(fd_ack, &ack, sizeof(ack)) == sizeof(ack))
         {
