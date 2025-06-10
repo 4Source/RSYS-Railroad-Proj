@@ -1,8 +1,6 @@
 #ifndef IDLE_H
 #define IDLE_H
 
-#include <stdint.h>
-
 /**
  * @struct IdleTelegram
  * @brief Represents the structure of a Digital Decoder Idle Packet.
@@ -24,15 +22,15 @@
  */
 typedef struct
 {
-    uint64_t reserved : 22;         // [bit 0 - 21]     Reserved for future use.
-    uint64_t stop_bit : 1;          // [bit 22]         Stop bit of the telegram. Fixed value: 1.
-    uint64_t checksum : 8;          // [bit 23 - 30]    An 8-bit field for the checksum value.
-    uint64_t start_bit_cs : 1;      // [bit 31]         Start bit for the checksum field. Fixed value: 0.
-    uint64_t command : 8;           // [bit 32 - 39]    Command field. Fixed value: 0 (Idle command).
-    uint64_t start_bit_cmd : 1;     // [bit 40]         Start bit for the command field. Fixed value: 0.
-    uint64_t address : 8;           // [bit 41 - 48]    Address field. Fixed value: 0b11111111 (0xFF) (Idle packet address).
-    uint64_t start_bit_address : 1; // [bit 49]         Start bit for the address field. Fixed value: 0.
-    uint64_t preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
+    unsigned long long reserved : 22;         // [bit 0 - 21]     Reserved for future use.
+    unsigned long long stop_bit : 1;          // [bit 22]         Stop bit of the telegram. Fixed value: 1.
+    unsigned long long checksum : 8;          // [bit 23 - 30]    An 8-bit field for the checksum value.
+    unsigned long long start_bit_cs : 1;      // [bit 31]         Start bit for the checksum field. Fixed value: 0.
+    unsigned long long command : 8;           // [bit 32 - 39]    Command field. Fixed value: 0 (Idle command).
+    unsigned long long start_bit_cmd : 1;     // [bit 40]         Start bit for the command field. Fixed value: 0.
+    unsigned long long address : 8;           // [bit 41 - 48]    Address field. Fixed value: 0b11111111 (0xFF) (Idle packet address).
+    unsigned long long start_bit_address : 1; // [bit 49]         Start bit for the address field. Fixed value: 0.
+    unsigned long long preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
 } IdleTelegram;
 
 /**

@@ -1,19 +1,19 @@
 #include "telegram/locomotive.h"
 
-LocomotiveTelegram buildLocomotiveTelegram(LocomotiveData data)
+unsigned long long buildLocomotiveTelegram(LocomotiveData data)
 {
     // Set the MSB to (0b0)
-    uint8_t address = 0b00000000 | data.address;
+    char address = 0b00000000 | data.address;
 
     // Construct the command byte:
     // - The first two bits are set to 0b01
     // - The direction bit is shifted to bit 5
     // - The light bit is shifted to bit 4
     // - The speed value occupies bits 0 - 3
-    uint8_t command = 0b01000000 | (data.direction << 5) | (data.light << 4) | data.speed;
+    char command = 0b01000000 | (data.direction << 5) | (data.light << 4) | data.speed;
 
     // Calculate the checksum as the XOR of the address and command bytes
-    uint8_t checksum = address ^ command;
+    char checksum = address ^ command;
 
     // Build the LocomotiveTelegram structure with the calculated values
     LocomotiveTelegram telegram = {
@@ -31,6 +31,8 @@ LocomotiveTelegram buildLocomotiveTelegram(LocomotiveData data)
         .stop_bit = 1,                // Stop bit
         .reserved = 0,                // Reserved field
     };
-
-    return telegram;
+    LocomotiveConverter converter;
+    converter.lt = telegram;
+    
+    return converter.ull;
 }

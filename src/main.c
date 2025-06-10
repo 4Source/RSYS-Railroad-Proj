@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "telegram/magnetic.h"
+#include "telegram/locomotive.h"
 #include "command.h"
 
 int main()
