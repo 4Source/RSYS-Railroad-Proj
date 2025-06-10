@@ -90,4 +90,10 @@ typedef struct
  */
 unsigned long long buildMagneticTelegram(MagneticData data);
 
+
+typedef union MagneticConverter {
+    MagneticTelegram mt;
+    unsigned long long ull;
+}MagneticConverter;
+
 #endif

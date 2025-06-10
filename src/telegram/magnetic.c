@@ -41,6 +41,8 @@ unsigned long long buildMagneticTelegram(MagneticData data)
         .stop_bit = 1,                // Fixed stop bit
         .reserved = 0                 // Reserved field, set to 0
     };
-
-    return (unsigned long long)telegram;
+    MagneticConverter converter;
+    converter.mt = telegram;
+    
+    return converter.ull;
 }
