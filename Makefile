@@ -1,7 +1,7 @@
-build_all: rtai_main interface_main
+build_all: rtai_module interface_main
 
-rtai_main:
-	$(MAKE) -C src rtai_main
+rtai_module:
+	$(MAKE) -C src rtai_module
 
 interface_main:
 	$(MAKE) -C src interface_main

@@ -4,7 +4,7 @@
 
 #include "command.h"
 #include "config.h"
-#include "communication/linux_rtai_communicatin.h"
+#include "communication/linux_rtai_communication.h"
 
 #define CMD_CNT 5
 Command commands[] = {
@@ -116,7 +116,13 @@ void cmd_loc(char *args)
     int options_valid = 1;
 
     int address = -1;
-    char alias[20] = "";
+    char *alias = malloc(20 * sizeof(char));
+    if (alias == NULL)
+    {
+        perror("Allocation error");
+        exit(EXIT_FAILURE);
+    }
+    alias[0] = '\0';
     int direction = -1;
     int light = -1;
     int speed = -1;
@@ -151,7 +157,7 @@ void cmd_loc(char *args)
             if (value != NULL)
             {
                 // Only allow alphanumeric aliases
-                if (sscanf(value, "%[A-Z,a-z,0-9]s", &alias) != 1)
+                if (sscanf(value, "%[A-Z,a-z,0-9]s", alias) != 1)
                 {
                     printf("Invalid argument '%s' for alias\n", value);
                     options_valid = 0;
@@ -283,7 +289,8 @@ void cmd_loc(char *args)
                 .direction = 0,
                 .light = 0,
                 .speed = 0,
-                .reserved = 0,
+                .type = 0,
+                .ack = 0,
             }};
 
         size_t num_locomotives = sizeof(locomotives_user) / sizeof(locomotives_user[0]);
@@ -350,8 +357,10 @@ void cmd_loc(char *args)
         }
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
-        // Send not changes instead send uint16_t rtai side needs to check if there is a matching object to the address
-        send_with_ack(loc.data);
+        // Send not changes instead send unsigned short rtai side needs to check if there is a matching object to the address
+        LocomotiveDataConverter converter;
+        converter.ld = loc.data;
+        send_with_ack(converter.us, 3);
     }
     else
     {
@@ -507,7 +516,8 @@ void cmd_mag(char *args)
                 .control = 0,
                 .device = 0,
                 .enable = 0,
-                .reserved = 0,
+                .type = 0,
+                .ack = 0,
             }};
 
         size_t num_magnetics = sizeof(magnetic_user) / sizeof(magnetic_user[0]);
@@ -566,7 +576,9 @@ void cmd_mag(char *args)
         }
 
         // TODO: Send changes to rtai part and check for acknowledge. Measure time between send and checks. Check the timeout exceeded. Check the FIFO contains the message if not but no acknowledge resend.
-        send_with_ack(mag.data);
+        MagneticDataConverter converter;
+        converter.md = mag.data;
+        send_with_ack(converter.us, 3);
     }
     else
     {

@@ -11,6 +11,8 @@ INCLUDE_DIR := $(PWD)/include
 
 # Set the name of the kernel module
 obj-m	:= rtai_main.o
+rtai_main-y += telegram/locomotive.o telegram/magnetic.o
+rtai_main-y += communication/railroad_communication.o 
 rtai_main-y += communication/rtai_linux_communication.o
 
 # Flags to give to the compiler
@@ -21,12 +23,12 @@ ccflags-y += -I$(INCLUDE_DIR)
 KDIR	:= /lib/modules/$(shell uname -r)/build
 
 # Make rtai kernel module
-rtai_main: rtai_main.c
+rtai_module:
 	$(MAKE) -C $(KDIR) M=$(SRC_DIR) modules
 
 # Make user interface program
-interface_main: main.c
-	gcc main.c -I $(INCLUDE_DIR) -o dcc
+interface_main: main.c command.c telegram/locomotive.c telegram/magnetic.c communication/linux_rtai_communication.c
+	gcc main.c command.c telegram/locomotive.c telegram/magnetic.c communication/linux_rtai_communication.c -I $(INCLUDE_DIR) -o dcc
 	chmod u+x dcc
 
 clean:

@@ -14,6 +14,6 @@
  * @param attempts The maximum number of transmission attempts (defaults to 3).
  * @return int Returns a status code indicating success or failure of the transmission.
  */
-int send_with_ack(uint16_t data, int attempts = 3);
+int send_with_ack(unsigned short data, int attempts);
 
 #endif

@@ -1,4 +1,4 @@
-#include "communication/linux_rtai_communicatin.h"
+#include "communication/linux_rtai_communication.h"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -6,14 +6,14 @@
 #define FIFO_CMD "dev/rtf3"
 #define FIFO_ACK "dev/rtf4"
 
-int send_with_ack(uint16_t data, int attempts = 3)
+int send_with_ack(unsigned short data, int attempts)
 {
     // Open the command FIFO in write-only mode
     int fd_cmd = open(FIFO_CMD, O_WRONLY);
     if (fd_cmd < 0)
     {
         // If the command FIFO can't be opened, log the error
-        printf("Failed to open command fifo!");
+        printf("Failed to open command fifo!\n");
         return -1;
     }
 
@@ -36,7 +36,7 @@ int send_with_ack(uint16_t data, int attempts = 3)
         // Pause briefly (50 milliseconds) to wait for an acknowledgment
         usleep(50000);
 
-        uint16_t ack;
+        unsigned short ack;
         // Try reading the acknowledgment from the FIFO
         if (read(fd_ack, &ack, sizeof(ack)) == sizeof(ack))
         {
