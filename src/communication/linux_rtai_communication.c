@@ -1,5 +1,6 @@
 #include "communication/linux_rtai_communication.h"
 
+#include <rtai_fifos.h>
 #include <fcntl.h>
 #include <unistd.h>
 
