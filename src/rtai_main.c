@@ -412,12 +412,12 @@ void send_init_dcc(long j)
   for (i = 0; i < 20; i++)
   {
     send_bit_task(reset_msg, BIT_MESSAGE_LENGTH);
-    rt_printk(".")
+    rt_printk(".");
   }
   for (i = 0; i < 10; i++)
   {
     send_bit_task(idle_msg, BIT_MESSAGE_LENGTH);
-    rt_printk(".")
+    rt_printk(".");
   }
   rt_printk("Initialization of dcc system finished\n");
 }
