@@ -4,8 +4,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define FIFO_CMD "dev/rtf3"
-#define FIFO_ACK "dev/rtf4"
+#define FIFO_CMD "/dev/rtf3"
+#define FIFO_ACK "/dev/rtf4"
 #define SIZE 1024
 
 int send_with_ack(unsigned short data, int attempts)
