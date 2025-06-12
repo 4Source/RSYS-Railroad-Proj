@@ -1,4 +1,3 @@
-#include <linux/kernel.h>
 #include <linux/module.h>
 #include <rtai.h>
 #include <rtai_sched.h>
@@ -12,9 +11,9 @@
 #define FIFO_ACK 4
 #define STACK_SIZE 4096
 #define FIFO_SIZE 1024
-#define PERIOD_TIMER 20000000
-#define PERIOD_MAG_TASK 70000000
-#define PERIOD_LOC_TASK 60000000
+#define PERIOD_TIMER 1000000
+#define PERIOD_MAG_TASK 5000000 // TODO:
+#define PERIOD_LOC_TASK 5000000 // TODO:
 
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
@@ -23,12 +22,12 @@
 #define MAG_MSQ_SIZE 4
 #define BIT_MESSAGE_LENGTH 42
 
-static SEM bit_sem;
-static SEM loc_sem[LOC_MSQ_SIZE];
-static SEM mag_sem[MAG_MSQ_SIZE];
+SEM bit_sem;
+SEM loc_sem[LOC_MSQ_SIZE];
+SEM mag_sem[MAG_MSQ_SIZE];
 
-static RT_TASK loco_tasks[LOC_MSQ_SIZE];
-static RT_TASK *magnetic_task = NULL;
+RT_TASK loco_tasks[LOC_MSQ_SIZE];
+RT_TASK magnetic_task = NULL;
 
 const int locomotive_count = 3;
 int magnetic_msg_count = 0;
@@ -310,7 +309,7 @@ static __init int send_init(void)
 {
   rt_printk("Start loading module...");
   int ret = 0;
-  rt_mount_rtai();
+  rt_mount();
 
   rt_sem_init(&bit_sem, 1);
   int i;
@@ -354,7 +353,7 @@ static __init int send_init(void)
     ret = -1;
   }
 
-  int task_init_res = rt_task_init(magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
+  int task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
   if (task_init_res != 0)
   {
     rt_printk("Failed to init magnetic task with %d!\n", task_init_res);
@@ -362,7 +361,7 @@ static __init int send_init(void)
   }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
-    task_init_res = rt_task_init(&loco_tasks[i], send_loco_msg_task, i, STACK_SIZE, 1, 0, 0);
+    task_init_res = rt_task_init(&loco_tasks[i], send_loco_msg_task, 0, STACK_SIZE, 1, 0, 0);
     if (task_init_res != 0)
     {
       rt_printk("Failed to init locomotive %d task with %d!\n", i, task_init_res);
@@ -373,7 +372,7 @@ static __init int send_init(void)
   rt_set_periodic_mode();
   start_rt_timer(nano2count(PERIOD_TIMER));
 
-  int task_make_res = rt_task_make_periodic(magnetic_task, rt_get_time() + nano2count(1000000000), nano2count(PERIOD_MAG_TASK));
+  int task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
   if (task_make_res != 0)
   {
     rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
@@ -381,7 +380,7 @@ static __init int send_init(void)
   }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
-    task_make_res = rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(1000000000), nano2count(PERIOD_LOC_TASK + i));
+    task_make_res = rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(10000000), nano2count(PERIOD_LOC_TASK + i));
     if (task_make_res != 0)
     {
       rt_printk("Failed to make periodic locomotive %d task with %d!\n", i, task_make_res);
@@ -399,7 +398,7 @@ static __exit void send_exit(void)
   rt_printk("Start unloading module...");
   stop_rt_timer();
 
-  rt_task_delete(magnetic_task);
+  rt_task_delete(&magnetic_task);
   int i;
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
@@ -419,7 +418,7 @@ static __exit void send_exit(void)
     rt_sem_delete(&mag_sem[i]);
   }
 
-  rt_umount_rtai();
+  rt_umount();
   rt_printk("Unloading module\n");
 }
 
