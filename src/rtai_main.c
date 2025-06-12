@@ -330,6 +330,20 @@ static __init int send_init(void)
   if (fifo_create_res - FIFO_SIZE != 0)
   {
     rt_printk("Failed to create cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_create_res);
+
+    rtf_destroy(FIFO_CMD);
+
+    rt_sem_delete(&bit_sem);
+    int i;
+    for (i = 0; i < LOC_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&loc_sem[i]);
+    }
+    for (i = 0; i < MAG_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&mag_sem[i]);
+    }
+
     rt_umount_rtai();
     return fifo_create_res;
   }
@@ -337,6 +351,20 @@ static __init int send_init(void)
   if (handler_res != 0)
   {
     rt_printk("Failed to create cmd fifo handler with %d!\n", handler_res);
+
+    rtf_destroy(FIFO_CMD);
+
+    rt_sem_delete(&bit_sem);
+    int i;
+    for (i = 0; i < LOC_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&loc_sem[i]);
+    }
+    for (i = 0; i < MAG_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&mag_sem[i]);
+    }
+
     rt_umount_rtai();
     return handler_res;
   }
@@ -349,6 +377,21 @@ static __init int send_init(void)
   if (fifo_create_res - FIFO_SIZE != 0)
   {
     rt_printk("Failed to create ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_create_res);
+
+    rtf_destroy(FIFO_ACK);
+    rtf_destroy(FIFO_CMD);
+
+    rt_sem_delete(&bit_sem);
+    int i;
+    for (i = 0; i < LOC_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&loc_sem[i]);
+    }
+    for (i = 0; i < MAG_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&mag_sem[i]);
+    }
+
     rt_umount_rtai();
     return fifo_create_res;
   }
@@ -357,6 +400,24 @@ static __init int send_init(void)
   if (task_init_res != 0)
   {
     rt_printk("Failed to init magnetic task with %d!\n", task_init_res);
+    stop_rt_timer();
+
+    rt_task_delete(magnetic_task);
+
+    rtf_destroy(FIFO_ACK);
+    rtf_destroy(FIFO_CMD);
+
+    rt_sem_delete(&bit_sem);
+    int i;
+    for (i = 0; i < LOC_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&loc_sem[i]);
+    }
+    for (i = 0; i < MAG_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&mag_sem[i]);
+    }
+
     rt_umount_rtai();
     return task_init_res;
   }
@@ -366,6 +427,27 @@ static __init int send_init(void)
     if (task_init_res != 0)
     {
       rt_printk("Failed to init locomotive %d task with %d!\n", i, task_init_res);
+
+      int j;
+      for (j = 0; j < i; j++)
+      {
+        rt_task_delete(&loco_tasks[j]);
+      }
+      rt_task_delete(magnetic_task);
+
+      rtf_destroy(FIFO_ACK);
+      rtf_destroy(FIFO_CMD);
+
+      rt_sem_delete(&bit_sem);
+      for (i = 0; i < LOC_MSQ_SIZE; i++)
+      {
+        rt_sem_delete(&loc_sem[i]);
+      }
+      for (i = 0; i < MAG_MSQ_SIZE; i++)
+      {
+        rt_sem_delete(&mag_sem[i]);
+      }
+
       rt_umount_rtai();
       return task_init_res;
     }
@@ -378,6 +460,28 @@ static __init int send_init(void)
   if (task_make_res != 0)
   {
     rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
+    stop_rt_timer();
+
+    int j;
+    for (j = 0; j < i; j++)
+    {
+      rt_task_delete(&loco_tasks[j]);
+    }
+    rt_task_delete(magnetic_task);
+
+    rtf_destroy(FIFO_ACK);
+    rtf_destroy(FIFO_CMD);
+
+    rt_sem_delete(&bit_sem);
+    for (i = 0; i < LOC_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&loc_sem[i]);
+    }
+    for (i = 0; i < MAG_MSQ_SIZE; i++)
+    {
+      rt_sem_delete(&mag_sem[i]);
+    }
+
     rt_umount_rtai();
     return task_make_res;
   }
@@ -387,8 +491,30 @@ static __init int send_init(void)
     if (task_make_res != 0)
     {
       rt_printk("Failed to make periodic locomotive %d task with %d!\n", i, task_make_res);
-      rt_umount_rtai();
-      return task_make_res;
+      stop_rt_timer();
+
+      int j;
+      for (j = 0; j < i; j++)
+      {
+        rt_task_delete(&loco_tasks[j]);
+      }
+      rt_task_delete(magnetic_task);
+
+      rtf_destroy(FIFO_ACK);
+      rtf_destroy(FIFO_CMD);
+
+      rt_sem_delete(&bit_sem);
+      for (i = 0; i < LOC_MSQ_SIZE; i++)
+      {
+        rt_sem_delete(&loc_sem[i]);
+      }
+      for (i = 0; i < MAG_MSQ_SIZE; i++)
+      {
+        rt_sem_delete(&mag_sem[i]);
+      }
+
+    rt_umount_rtai();
+    return task_make_res;
     }
   }
 
@@ -408,8 +534,8 @@ static __exit void send_exit(void)
     rt_task_delete(&loco_tasks[i]);
   }
 
-  rtf_destroy(FIFO_CMD);
   rtf_destroy(FIFO_ACK);
+  rtf_destroy(FIFO_CMD);
 
   rt_sem_delete(&bit_sem);
   for (i = 0; i < LOC_MSQ_SIZE; i++)
