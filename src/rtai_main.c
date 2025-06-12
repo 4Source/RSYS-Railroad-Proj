@@ -52,11 +52,11 @@ void send_ack(unsigned short raw)
 
   if (result < 0)
   {
-    printk("Error sending ACK: rtf_put returned %d.\n", result);
+    rt_printk("Error sending ACK: rtf_put returned %d.\n", result);
   }
   else if (result != sizeof(raw))
   {
-    printk("ACK could not be sent completely. Expected: %lu, received: %d.\n", sizeof(raw), result);
+    rt_printk("ACK could not be sent completely. Expected: %lu, received: %d.\n", sizeof(raw), result);
   }
 }
 
@@ -113,17 +113,18 @@ int fifo_handler(unsigned int fifo)
       LocomotiveData loco = converter.locomotive_data;
 
       int index = findIndexOfLocAddress(loco);
+      rt_printk("Index of address %d is %d", loco.address, index);
       if (index >= 0)
       {
         rt_sem_wait(&loc_sem[index]);
         locomotive_msg_queue[index] = loco;
         rt_sem_signal(&loc_sem[index]);
-        printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n", loco.address, loco.speed, loco.direction, loco.light);
+        rt_printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n", loco.address, loco.speed, loco.direction, loco.light);
         send_ack(raw);
       }
       else
       {
-        printk("Invalid locomotive address: %d\n", loco.address);
+        rt_printk("Invalid locomotive address: %d\n", loco.address);
       }
     }
     else if (type == 0x2)
@@ -140,22 +141,22 @@ int fifo_handler(unsigned int fifo)
         magnetic_msg_queue[index] = mag;
         rt_sem_signal(&mag_sem[index]);
         magnetic_msg_count++;
-        printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
+        rt_printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
         send_ack(raw);
       }
       else
       {
-        printk("Magnetic queue full!\n");
+        rt_printk("Magnetic queue full!\n");
       }
     }
     else
     {
-      printk("Unknown message type: %d\n", type);
+      rt_printk("Unknown message type: %d\n", type);
     }
   }
   else
   {
-    printk("Invalid FIFO data (only %d bytes)\n", r);
+    rt_printk("Invalid FIFO data (only %d bytes)\n", r);
   }
 
   return 0;
