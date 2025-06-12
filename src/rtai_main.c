@@ -321,11 +321,17 @@ static __init int send_init(void)
     rt_sem_init(&mag_sem[i], 1);
   }
 
-  int fifo_res = rtf_create(FIFO_CMD, FIFO_SIZE);
-  if (fifo_res - FIFO_SIZE != 0)
+  int fifo_destroy_res = rtf_destroy(FIFO_CMD);
+  if (fifo_destroy_res < 0)
   {
-    rt_printk("Failed to create cmd fifo with %d!\n", fifo_res);
-    return fifo_res;
+    rt_printk("Failed to destroy cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_destroy_res);
+    return fifo_destroy_res;
+  }
+  int fifo_create_res = rtf_create(FIFO_CMD, FIFO_SIZE);
+  if (fifo_create_res - FIFO_SIZE != 0)
+  {
+    rt_printk("Failed to create cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_create_res);
+    return fifo_create_res;
   }
   int handler_res = rtf_create_handler(FIFO_CMD, &fifo_handler);
   if (handler_res != 0)
@@ -333,11 +339,17 @@ static __init int send_init(void)
     rt_printk("Failed to create cmd fifo handler with %d!\n", handler_res);
     return handler_res;
   }
-  fifo_res = rtf_create(FIFO_ACK, FIFO_SIZE);
-  if (fifo_res - FIFO_SIZE != 0)
+  fifo_destroy_res = rtf_destroy(FIFO_ACK);
+  if (fifo_destroy_res < 0)
   {
-    rt_printk("Failed to create ack fifo with %d!\n", fifo_res);
-    return fifo_res;
+    rt_printk("Failed to destroy ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_destroy_res);
+    return fifo_destroy_res;
+  }
+  fifo_create_res = rtf_create(FIFO_ACK, FIFO_SIZE);
+  if (fifo_create_res - FIFO_SIZE != 0)
+  {
+    rt_printk("Failed to create ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_create_res);
+    return fifo_create_res;
   }
 
   int task_init_res = rt_task_init(magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
