@@ -481,21 +481,29 @@ static __init int send_init(void)
     }
   }
 
-  // rt_set_periodic_mode();
-  // start_rt_timer(nano2count(PERIOD_TIMER));
-  rt_set_oneshot_mode();
-  start_rt_timer(0);
+  rt_set_periodic_mode();
+  start_rt_timer(nano2count(PERIOD_TIMER));
+  // rt_set_oneshot_mode();
+  // start_rt_timer(0);
 
   int task_make_res;
+  rt_printk("Make one shot task 'init'\n");
   task_make_res = rt_task_resume(&init_task);
-  // task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
   if (task_make_res != 0)
   {
-    rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
+    rt_printk("Failed to make one shot init task with %d!\n", task_make_res);
     ret = -1;
   }
+  rt_printk("Make periodic task 'mag'\n");
+  // task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
+  // if (task_make_res != 0)
+  // {
+  //   rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
+  //   ret = -1;
+  // }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
+    rt_printk("Make periodic task 'loc %d'\n", i);
     task_make_res = rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(10000000), nano2count(PERIOD_LOC_TASK + i));
     if (task_make_res != 0)
     {
