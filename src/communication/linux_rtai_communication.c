@@ -1,10 +1,12 @@
 #include "communication/linux_rtai_communication.h"
 
+#include <rtai_fifos.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-#define FIFO_CMD "dev/rtf3"
-#define FIFO_ACK "dev/rtf4"
+#define FIFO_CMD "/dev/rtf3"
+#define FIFO_ACK "/dev/rtf4"
+#define SIZE 1024
 
 int send_with_ack(unsigned short data, int attempts)
 {
@@ -13,8 +15,8 @@ int send_with_ack(unsigned short data, int attempts)
     if (fd_cmd < 0)
     {
         // If the command FIFO can't be opened, log the error
-        printf("Failed to open command fifo!\n");
-        return -1;
+        printf("Failed to open command fifo with %d!\n", fd_cmd);
+        return fd_cmd;
     }
 
     // Open the acknowledgment FIFO in read-only, non-blocking mode
@@ -22,9 +24,9 @@ int send_with_ack(unsigned short data, int attempts)
     if (fd_ack < 0)
     {
         // If the acknowledgment FIFO can't be opened, log the error, close the command FIFO
-        printf("Failed to open acknowledge fifo!");
+        printf("Failed to open acknowledge fifo with %d!\n", fd_ack);
         close(fd_cmd);
-        return -1;
+        return fd_ack;
     }
 
     // Attempt to send the command multiple times (up to 'attempts')
@@ -56,7 +58,7 @@ int send_with_ack(unsigned short data, int attempts)
     }
 
     // After all attempts, if no valid acknowledgment is received, log the failure
-    printf("Failed to send command");
+    printf("Failed to send command!\n");
     // Close FIFOs
     close(fd_cmd);
     close(fd_ack);

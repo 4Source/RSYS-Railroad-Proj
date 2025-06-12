@@ -28,7 +28,7 @@ rtai_module:
 
 # Make user interface program
 interface_main: main.c command.c telegram/locomotive.c telegram/magnetic.c communication/linux_rtai_communication.c
-	gcc main.c command.c telegram/locomotive.c telegram/magnetic.c communication/linux_rtai_communication.c -I $(INCLUDE_DIR) -o dcc
+	gcc main.c command.c telegram/locomotive.c telegram/magnetic.c communication/linux_rtai_communication.c -I/usr/realtime/include -I $(INCLUDE_DIR) -o dcc
 	chmod u+x dcc
 
 clean:
