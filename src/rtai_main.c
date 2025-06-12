@@ -13,7 +13,7 @@
 #define FIFO_SIZE 1024
 #define PERIOD_TIMER 1000000
 #define PERIOD_MAG_TASK 50000000
-#define PERIOD_LOC_TASK 5000000
+#define PERIOD_LOC_TASK 10000000
 
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
@@ -34,7 +34,7 @@ int magnetic_msg_count = 0;
 LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
     {.address = 1, .light = 0, .direction = 0, .speed = 0},
     // {.address = 2, .light = 0, .direction = 0, .speed = 0},
-    {.address = 3, .light = 1, .direction = 1, .speed = 15},
+    {.address = 3, .light = 1, .direction = 1, .speed = 0},
 };
 MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {
     {.address = 0, .device = 1, .enable = 0, .control = 0},
