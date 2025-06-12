@@ -308,7 +308,7 @@ unsigned long long buildLocomotiveTelegram(LocomotiveData data)
  *
  * @return IdleTelegram A fully initialized idle telegram structure.
  */
-unsigned long long buildIdleTelegram()
+unsigned long long buildIdleTelegram(void)
 {
   IdleTelegram telegram = {
       .preamble = 0b11111111111111, // Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
@@ -339,7 +339,7 @@ unsigned long long buildIdleTelegram()
  *
  * @return ResetAllTelegram A fully initialized reset telegram structure.
  */
-unsigned long long buildResetAllTelegram()
+unsigned long long buildResetAllTelegram(void)
 {
   ResetAllTelegram telegram = {
       .preamble = 0b11111111111111, // Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
