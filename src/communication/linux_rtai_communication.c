@@ -1,6 +1,5 @@
 #include "communication/linux_rtai_communication.h"
 
-#include <rtai_fifos.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -10,6 +9,7 @@
 
 int send_with_ack(unsigned short data, int attempts)
 {
+    printf("Sending data 0x%04X", data);
     // Open the command FIFO in write-only mode
     int fd_cmd = open(FIFO_CMD, O_WRONLY);
     if (fd_cmd < 0)

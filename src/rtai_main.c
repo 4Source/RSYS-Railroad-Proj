@@ -67,13 +67,14 @@ int fifo_handler(unsigned int fifo)
   unsigned short raw;
 
   r = rtf_get(FIFO_CMD, command, sizeof(command) - 1);
-  rt_printk("Fifo handler: Got %d", r);
+  rt_printk("Fifo handler got %d bytes\n", r);
+
   if (r >= sizeof(unsigned short))
   {
     memcpy(&raw, command, sizeof(unsigned short));
     // command[r] = 0;
     // sscanf(command, "%d", &raw);
-    rt_printk("Received command: %d", raw);
+    rt_printk("Received command: 0x%04X\n", raw);
 
     // Check type (bits 13-14)
     unsigned short type = (raw >> 13) & 0x3;
