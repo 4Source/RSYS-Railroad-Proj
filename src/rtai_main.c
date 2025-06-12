@@ -12,8 +12,8 @@
 #define STACK_SIZE 4096
 #define FIFO_SIZE 1024
 #define PERIOD_TIMER 1000000
-#define PERIOD_MAG_TASK 5000000 // TODO:
-#define PERIOD_LOC_TASK 5000000 // TODO:
+#define PERIOD_MAG_TASK 50000000
+#define PERIOD_LOC_TASK 5000000
 
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
@@ -268,26 +268,30 @@ unsigned long long buildLocomotiveTelegram(LocomotiveData data)
 
 void send_magnetic_msg_task(long arg)
 {
-  if (magnetic_msg_count > 0)
+  while (1)
   {
-    rt_sem_wait(&mag_sem[0]);
-    unsigned long long telegram = buildMagneticTelegram(magnetic_msg_queue[0]);
-    rt_sem_signal(&mag_sem[0]);
-    send_bit_task(telegram, BIT_MESSAGE_LENGTH);
+    if (magnetic_msg_count > 0)
+    {
+      rt_sem_wait(&mag_sem[0]);
+      unsigned long long telegram = buildMagneticTelegram(magnetic_msg_queue[0]);
+      rt_sem_signal(&mag_sem[0]);
+      send_bit_task(telegram, BIT_MESSAGE_LENGTH);
 
-    // Shift queue elements
-    int i;
-    for (i = 1; i < magnetic_msg_count; i++)
-    {
-      magnetic_msg_queue[i - 1] = magnetic_msg_queue[i];
+      // Shift queue elements
+      int i;
+      for (i = 1; i < magnetic_msg_count; i++)
+      {
+        magnetic_msg_queue[i - 1] = magnetic_msg_queue[i];
+      }
+      magnetic_msg_count--;
+      if (magnetic_msg_count >= 0)
+      {
+        MagneticDataConverter converter;
+        converter.unsigned_short = 0;
+        magnetic_msg_queue[magnetic_msg_count] = converter.magnetic_data;
+      }
     }
-    magnetic_msg_count--;
-    if (magnetic_msg_count >= 0)
-    {
-      MagneticDataConverter converter;
-      converter.unsigned_short = 0;
-      magnetic_msg_queue[magnetic_msg_count] = converter.magnetic_data;
-    }
+    rt_task_wait_period();
   }
 }
 
@@ -295,8 +299,6 @@ void send_loco_msg_task(long i)
 {
   while (1)
   {
-    outb(0x00, LPT1);
-
     if (i >= 0 && i < locomotive_count)
     {
       rt_sem_wait(&loc_sem[i]);
@@ -304,8 +306,6 @@ void send_loco_msg_task(long i)
       rt_sem_signal(&loc_sem[i]);
       send_bit_task(telegram, BIT_MESSAGE_LENGTH);
     }
-
-    outb(0x11, LPT1);
     rt_task_wait_period();
   }
 }
@@ -395,26 +395,26 @@ static __exit void send_exit(void)
   rt_printk("Start unloading module...");
   int i;
 
-  // stop_rt_timer();
+  stop_rt_timer();
 
-  // rt_task_delete(&magnetic_task);
-  // for (i = 0; i < LOC_MSQ_SIZE; i++)
-  // {
-  //   rt_task_delete(&loco_tasks[i]);
-  // }
+  rt_task_delete(&magnetic_task);
+  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  {
+    rt_task_delete(&loco_tasks[i]);
+  }
 
-  // rtf_destroy(FIFO_ACK);
+  rtf_destroy(FIFO_ACK);
   rtf_destroy(FIFO_CMD);
 
-  // rt_sem_delete(&bit_sem);
-  // for (i = 0; i < LOC_MSQ_SIZE; i++)
-  // {
-  //   rt_sem_delete(&loc_sem[i]);
-  // }
-  // for (i = 0; i < MAG_MSQ_SIZE; i++)
-  // {
-  //   rt_sem_delete(&mag_sem[i]);
-  // }
+  rt_sem_delete(&bit_sem);
+  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  {
+    rt_sem_delete(&loc_sem[i]);
+  }
+  for (i = 0; i < MAG_MSQ_SIZE; i++)
+  {
+    rt_sem_delete(&mag_sem[i]);
+  }
 
   rt_umount();
   rt_printk("Unloading module\n");
