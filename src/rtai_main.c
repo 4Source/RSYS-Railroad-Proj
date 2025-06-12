@@ -27,8 +27,8 @@ static SEM bit_sem;
 static SEM loc_sem[LOC_MSQ_SIZE];
 static SEM mag_sem[MAG_MSQ_SIZE];
 
-RT_TASK loco_tasks[LOC_MSQ_SIZE];
-RT_TASK *magnetic_task = NULL;
+static RT_TASK loco_tasks[LOC_MSQ_SIZE];
+static RT_TASK *magnetic_task = NULL;
 
 const int locomotive_count = 3;
 int magnetic_msg_count = 0;
