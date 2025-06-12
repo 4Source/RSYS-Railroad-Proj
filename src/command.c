@@ -515,7 +515,7 @@ void cmd_mag(char *args)
                 .address = 0,
                 .control = 0,
                 .device = 0,
-                .enable = 0,
+                .enable = 1,
                 .type = 2,
                 .ack = 0,
             }};
