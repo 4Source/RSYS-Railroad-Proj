@@ -15,7 +15,7 @@
 #define FIFO_SIZE 1024
 #define PERIOD_TIMER 1000000
 #define PERIOD_MAG_TASK 50000000
-#define PERIOD_LOC_TASK 30000000
+#define PERIOD_LOC_TASK 15000000
 
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
@@ -405,19 +405,21 @@ void send_loco_msg_task(long i)
 
 void send_init_dcc(long j)
 {
-  rt_printk("Start initialization of dcc system...");
+  rt_printk("Start initialization of dcc system...\n");
   unsigned long long reset_msg = buildResetAllTelegram();
   unsigned long long idle_msg = buildIdleTelegram();
   int i;
   for (i = 0; i < 20; i++)
   {
     send_bit_task(reset_msg, BIT_MESSAGE_LENGTH);
+    rt_printk(".")
   }
   for (i = 0; i < 10; i++)
   {
     send_bit_task(idle_msg, BIT_MESSAGE_LENGTH);
+    rt_printk(".")
   }
-  rt_printk("Initialization of dcc system finished");
+  rt_printk("Initialization of dcc system finished\n");
 }
 
 static __init int send_init(void)
