@@ -4,8 +4,10 @@
 #include <rtai_sem.h>
 #include <rtai_fifos.h>
 
+#include "telegram/idle.h"
 #include "telegram/locomotive.h"
 #include "telegram/magnetic.h"
+#include "telegram/reset.h"
 
 #define FIFO_CMD 3
 #define FIFO_ACK 4
@@ -425,8 +427,8 @@ static __init int send_init(void)
   int ret = 0;
   rt_mount();
 
-  rt_printk("Initialize sem")
-      rt_sem_init(&bit_sem, 1);
+  rt_printk("Initialize sem");
+  rt_sem_init(&bit_sem, 1);
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
     rt_sem_init(&loc_sem[i], 1);
