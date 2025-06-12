@@ -31,8 +31,7 @@ unsigned long long buildLocomotiveTelegram(LocomotiveData data)
         .stop_bit = 1,                // Stop bit
         .reserved = 0,                // Reserved field
     };
-    LocomotiveConverter converter;
-    converter.lt = telegram;
-    
-    return converter.ull;
+    LocomotiveConverter converter = {.locomotive_telegram = telegram};
+
+    return converter.unsigned_long_long;
 }

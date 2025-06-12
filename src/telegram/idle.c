@@ -1,6 +1,6 @@
 #include "telegram/idle.h"
 
-IdleTelegram buildIdleTelegram()
+unsigned long long buildIdleTelegram(void)
 {
     IdleTelegram telegram = {
         .preamble = 0b11111111111111, // Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
@@ -14,5 +14,7 @@ IdleTelegram buildIdleTelegram()
         .reserved = 0                 // Reserved field, set to 0.
     };
 
-    return telegram;
+    IdleConverter converter = {.idle_telegram = telegram};
+
+    return converter.unsigned_long_long;
 }

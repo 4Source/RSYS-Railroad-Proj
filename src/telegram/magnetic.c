@@ -17,7 +17,7 @@ unsigned long long buildMagneticTelegram(MagneticData data)
     // - The MSB is set to 0b1
     // - The high bits of the address (inverted) are shifted to bits 4 - 6
     // - The control bit is shifted to bit 3
-    // - The device type occupies bit 2 - 1
+    // - The device type occupies bits 2 - 1
     // - The enable bit occupies bit 0
     char command = 0b10000000 | (address_high << 4) | (data.control << 3) | (data.device << 1) | data.enable;
 
@@ -41,8 +41,7 @@ unsigned long long buildMagneticTelegram(MagneticData data)
         .stop_bit = 1,                // Fixed stop bit
         .reserved = 0                 // Reserved field, set to 0
     };
-    MagneticConverter converter;
-    converter.mt = telegram;
-    
-    return converter.ull;
+    MagneticConverter converter = {.magnetic_telegram = telegram};
+
+    return converter.unsigned_long_long;
 }

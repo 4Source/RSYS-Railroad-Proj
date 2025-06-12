@@ -1,6 +1,6 @@
 #include "telegram/reset.h"
 
-ResetAllTelegram buildResetAllTelegram()
+unsigned long long buildResetAllTelegram(void)
 {
     ResetAllTelegram telegram = {
         .preamble = 0b11111111111111, // Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
@@ -14,5 +14,7 @@ ResetAllTelegram buildResetAllTelegram()
         .reserved = 0                 // Reserved field, set to 0
     };
 
-    return telegram;
+    ResetConverter converter = {.reset_telegram = telegram};
+
+    return converter.unsigned_long_long;
 }

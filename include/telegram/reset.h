@@ -35,6 +35,12 @@ typedef struct
     unsigned long long preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
 } ResetAllTelegram;
 
+typedef union ResetConverter
+{
+    ResetAllTelegram reset_telegram;
+    unsigned long long unsigned_long_long;
+} ResetConverter;
+
 /**
  * @function buildResetAllTelegram
  * @brief Constructs and initializes a ResetAllTelegram structure.
@@ -46,6 +52,6 @@ typedef struct
  *
  * @return ResetAllTelegram A fully initialized reset telegram structure.
  */
-ResetAllTelegram buildResetAllTelegram();
+unsigned long long buildResetAllTelegram(void);
 
 #endif
