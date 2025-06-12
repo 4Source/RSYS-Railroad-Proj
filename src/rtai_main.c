@@ -27,7 +27,7 @@ SEM loc_sem[LOC_MSQ_SIZE];
 SEM mag_sem[MAG_MSQ_SIZE];
 
 RT_TASK loco_tasks[LOC_MSQ_SIZE];
-RT_TASK magnetic_task = NULL;
+RT_TASK magnetic_task;
 
 const int locomotive_count = 3;
 int magnetic_msg_count = 0;
