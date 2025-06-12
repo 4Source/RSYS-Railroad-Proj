@@ -11,5 +11,3 @@ for MODULE in "${REQUIRED_MODULES[@]}"; do
         echo "Module '$MODULE' is already loaded."
     fi
 done
-
-lsmod | grep rtai
