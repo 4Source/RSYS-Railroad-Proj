@@ -325,7 +325,6 @@ static __init int send_init(void)
   if (fifo_destroy_res < 0)
   {
     rt_printk("Failed to destroy cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_destroy_res);
-    return fifo_destroy_res;
   }
   int fifo_create_res = rtf_create(FIFO_CMD, FIFO_SIZE);
   if (fifo_create_res - FIFO_SIZE != 0)
@@ -343,7 +342,6 @@ static __init int send_init(void)
   if (fifo_destroy_res < 0)
   {
     rt_printk("Failed to destroy ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_destroy_res);
-    return fifo_destroy_res;
   }
   fifo_create_res = rtf_create(FIFO_ACK, FIFO_SIZE);
   if (fifo_create_res - FIFO_SIZE != 0)
