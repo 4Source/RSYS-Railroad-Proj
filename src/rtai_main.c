@@ -38,12 +38,7 @@ LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
     // {.address = 2, .light = 0, .direction = 0, .speed = 0},
     {.address = 3, .light = 1, .direction = 1, .speed = 0},
 };
-MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {
-    {.address = 0, .device = 1, .enable = 0, .control = 0},
-    {.address = 0, .device = 2, .enable = 0, .control = 0},
-    {.address = 0, .device = 3, .enable = 0, .control = 0},
-    {.address = 0, .device = 4, .enable = 0, .control = 0},
-};
+MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {};
 
 void send_ack(unsigned short raw)
 {
@@ -137,12 +132,20 @@ int fifo_handler(unsigned int fifo)
       MagneticData mag = converter.magnetic_data;
 
       int index = findIndexOfMagAddress(mag);
-      rt_printk("Index of address %d is %d", mag.address, index);
+      rt_printk("Index of address %d device %d is %d", mag.address, mag.device, index);
       if (index >= 0)
       {
         rt_sem_wait(&mag_sem[index]);
         magnetic_msg_queue[index] = mag;
         rt_sem_signal(&mag_sem[index]);
+        rt_printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
+        send_ack(raw);
+      }
+      else if (magnetic_msg_count < MAG_MSQ_SIZE)
+      {
+        rt_sem_wait(&mag_sem[magnetic_msg_count]);
+        magnetic_msg_queue[magnetic_msg_count] = mag;
+        rt_sem_signal(&mag_sem[magnetic_msg_count]);
         magnetic_msg_count++;
         rt_printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
         send_ack(raw);
@@ -372,17 +375,14 @@ void send_magnetic_msg_task(long arg)
 
       // Shift queue elements
       int i;
+      MagneticDataConverter converter;
+      converter.unsigned_short = 0;
       for (i = 1; i < magnetic_msg_count; i++)
       {
         magnetic_msg_queue[i - 1] = magnetic_msg_queue[i];
+        magnetic_msg_queue[i] = converter.unsigned_short;
       }
       magnetic_msg_count--;
-      if (magnetic_msg_count >= 0)
-      {
-        MagneticDataConverter converter;
-        converter.unsigned_short = 0;
-        magnetic_msg_queue[magnetic_msg_count] = converter.magnetic_data;
-      }
     }
     rt_task_wait_period();
   }
