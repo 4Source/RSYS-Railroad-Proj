@@ -78,7 +78,7 @@ int fifo_handler(unsigned int fifo)
     if (type == 0x1)
     {
       LocomotiveDataConverter converter;
-      converter.unsigned_long_long = raw;
+      converter.unsigned_short = raw;
       // Locomotive
       LocomotiveData loco = converter.locomotive_data;
 
@@ -98,7 +98,7 @@ int fifo_handler(unsigned int fifo)
     else if (type == 0x2)
     {
       MagneticDataConverter converter;
-      converter.unsigned_long_long = raw;
+      converter.unsigned_short = raw;
       // Magnetic
       MagneticData mag = converter.magnetic_data;
 
@@ -280,7 +280,9 @@ void send_magnetic_msg_task(long arg)
     magnetic_msg_count--;
     if (magnetic_msg_count >= 0)
     {
-      magnetic_msg_queue[magnetic_msg_count] = 0;
+      MagneticDataConverter converter;
+      converter.unsigned_short = 0;
+      magnetic_msg_queue[magnetic_msg_count] = converter.magnetic_data;
     }
   }
 }
