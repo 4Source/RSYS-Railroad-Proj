@@ -289,7 +289,7 @@ void cmd_loc(char *args)
                 .direction = 0,
                 .light = 0,
                 .speed = 0,
-                .type = 0,
+                .type = 1,
                 .ack = 0,
             }};
 
@@ -516,7 +516,7 @@ void cmd_mag(char *args)
                 .control = 0,
                 .device = 0,
                 .enable = 0,
-                .type = 0,
+                .type = 2,
                 .ack = 0,
             }};
 
