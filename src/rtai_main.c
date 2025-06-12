@@ -350,6 +350,7 @@ static __init int send_init(void)
     ret = -1;
   }
 
+  int task_init_res;
   // int task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
   if (task_init_res != 0)
   {
@@ -369,6 +370,7 @@ static __init int send_init(void)
   rt_set_periodic_mode();
   start_rt_timer(nano2count(PERIOD_TIMER));
 
+  int task_make_res;
   // int task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
   if (task_make_res != 0)
   {
