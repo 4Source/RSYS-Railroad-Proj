@@ -13,7 +13,7 @@
 #define FIFO_SIZE 1024
 #define PERIOD_TIMER 1000000
 #define PERIOD_MAG_TASK 50000000
-#define PERIOD_LOC_TASK 10000000
+#define PERIOD_LOC_TASK 30000000
 
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
@@ -29,7 +29,6 @@ SEM mag_sem[MAG_MSQ_SIZE];
 RT_TASK loco_tasks[LOC_MSQ_SIZE];
 RT_TASK magnetic_task;
 
-const int locomotive_count = 3;
 int magnetic_msg_count = 0;
 LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
     {.address = 1, .light = 0, .direction = 0, .speed = 0},
@@ -328,7 +327,7 @@ void send_loco_msg_task(long i)
 {
   while (1)
   {
-    if (i >= 0 && i < locomotive_count)
+    if (i >= 0 && i < LOC_MSQ_SIZE)
     {
       rt_sem_wait(&loc_sem[i]);
       unsigned long long telegram = buildLocomotiveTelegram(locomotive_msg_queue[i]);
