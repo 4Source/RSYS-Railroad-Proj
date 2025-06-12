@@ -20,9 +20,23 @@
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
 #define LPT1 0x378        /* Parallel port address */
-#define LOC_MSQ_SIZE 1
-#define MAG_MSQ_SIZE 4
 #define BIT_MESSAGE_LENGTH 42
+
+#define LOC_MSQ_SIZE 2
+LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
+    {.address = 1, .light = 0, .direction = 0, .speed = 0},
+    // {.address = 2, .light = 0, .direction = 0, .speed = 0},
+    {.address = 3, .light = 1, .direction = 1, .speed = 0},
+};
+
+#define MAG_MSQ_SIZE 4
+int magnetic_msg_count = 0;
+MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {
+    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
+    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
+    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
+    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
+};
 
 static SEM bit_sem;
 static SEM loc_sem[LOC_MSQ_SIZE];
@@ -32,22 +46,18 @@ RT_TASK loco_tasks[LOC_MSQ_SIZE];
 RT_TASK magnetic_task;
 RT_TASK init_task;
 
-int magnetic_msg_count = 0;
-LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
-    // {.address = 1, .light = 0, .direction = 0, .speed = 0},
-    // {.address = 2, .light = 0, .direction = 0, .speed = 0},
-    {.address = 3, .light = 1, .direction = 1, .speed = 0},
-};
-MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {
-    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
-    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
-    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
-    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
-};
-
+/**
+ * send_ack - Send an acknowledgement with the ACK bit set.
+ *
+ * This function modifies the provided raw data by setting its 15th bit,
+ * marking it as an acknowledgement. It then sends the modified data to the FIFO_ACK channel.
+ *
+ * @param raw: An unsigned short value representing the data before setting
+ *             the ACK flag. Upon modification, the 15th bit is set.
+ */
 void send_ack(unsigned short raw)
 {
-  // Set bit 15 (ACK bit)
+  // Set bit 15 as the ACK flag.
   raw |= (1 << 15);
 
   int result = rtf_put(FIFO_ACK, &raw, sizeof(raw));
@@ -62,6 +72,17 @@ void send_ack(unsigned short raw)
   }
 }
 
+/**
+ * Finds the index of a locomotive in the locomotive message queue by its address.
+ *
+ * This function iterates through the globally defined locomotive message queue
+ * and compares each entry's address with the address provided in the given LocomotiveData structure.
+ * If a matching address is found, the index of that entry in the queue is returned.
+ * If no match is found, the function returns -1.
+ *
+ * @param loc A LocomotiveData structure containing the address to locate within the message queue.
+ * @return The index of the matching locomotive in the message queue if found; otherwise, -1.
+ */
 int findIndexOfLocAddress(LocomotiveData loc)
 {
   int i;
@@ -75,6 +96,16 @@ int findIndexOfLocAddress(LocomotiveData loc)
   return -1;
 }
 
+/**
+ * @brief Finds the index of a magnetic message in the magnetic message queue.
+ *
+ * This function iterates over the global magnetic_msg_queue array to locate the entry
+ * that matches both the address and device values of the provided MagneticData structure.
+ *
+ * @param mag A MagneticData structure that contains the address and device used for the lookup.
+ *
+ * @return The index of the matching magnetic message if found; otherwise, -1.
+ */
 int findIndexOfMagAddress(MagneticData mag)
 {
   int i;
@@ -88,71 +119,83 @@ int findIndexOfMagAddress(MagneticData mag)
   return -1;
 }
 
+/**
+ * Process a FIFO command based on its type.
+ *
+ * This function reads a command from a FIFO using rtf_get and interprets the first two
+ * bytes as an unsigned short. It extracts bits 13-14 to determine the command type and
+ * processes the command accordingly.
+ *
+ * @param fifo - An unsigned int representing the FIFO identifier (used for handling the FIFO), though not explicitly processed in this function.
+ *
+ * @return 0 on completion.
+ */
 int fifo_handler(unsigned int fifo)
 {
   char command[FIFO_SIZE];
   int r;
   unsigned short raw;
 
+  // Get data from FIFO_CMD channel.
   r = rtf_get(FIFO_CMD, command, sizeof(command) - 1);
-  rt_printk("Fifo handler got %d bytes\n", r);
+  rt_printk("Fifo handler received %d bytes\n", r);
 
   if (r >= sizeof(unsigned short))
   {
+    // Extract the 2-byte raw command
     memcpy(&raw, command, sizeof(unsigned short));
-    // command[r] = 0;
-    // sscanf(command, "%d", &raw);
-    rt_printk("Received command: 0x%04X\n", raw);
+    rt_printk("Fifo handler received command 0x%04X\n", raw);
 
-    // Check type (bits 13-14)
+    // Extract command type from bits 13-14. (Shift and mask with 0x3)
     unsigned short type = (raw >> 13) & 0x3;
 
-    if (type == 0x1)
+    if (type == 0x1) // Locomotive command
     {
-      LocomotiveDataConverter converter;
-      converter.unsigned_short = raw;
-      // Locomotive
-      LocomotiveData loco = converter.locomotive_data;
+      rt_printk("Command is of type: locomotive");
+      // Use union conversion to obtain message structure from raw
+      LocomotiveDataConverter converter = {.unsigned_short = raw};
 
-      int index = findIndexOfLocAddress(loco);
-      rt_printk("Index of address %d is %d", loco.address, index);
+      // Find correct index in locomotive_msg_queue
+      int index = findIndexOfLocAddress(converter.locomotive_data);
+      rt_printk("Index of address %d is %d", converter.locomotive_data.address, index);
       if (index >= 0)
       {
+        // Protect access to message queue using semaphore
         rt_sem_wait(&loc_sem[index]);
-        locomotive_msg_queue[index] = loco;
+        locomotive_msg_queue[index] = converter.locomotive_data;
         rt_sem_signal(&loc_sem[index]);
-        rt_printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n", loco.address, loco.speed, loco.direction, loco.light);
+        rt_printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n", converter.locomotive_data.address, converter.locomotive_data.speed, converter.locomotive_data.direction, converter.locomotive_data.light);
         send_ack(raw);
       }
       else
       {
-        rt_printk("Invalid locomotive address: %d\n", loco.address);
+        rt_printk("Invalid locomotive address: %d\n", converter.locomotive_data.address);
       }
     }
-    else if (type == 0x2)
+    else if (type == 0x2) // Magnetic command
     {
-      MagneticDataConverter converter;
-      converter.unsigned_short = raw;
-      // Magnetic
-      MagneticData mag = converter.magnetic_data;
+      rt_printk("Command is of type: magnetic");
+      MagneticDataConverter converter = {.unsigned_short = raw};
 
-      int index = findIndexOfMagAddress(mag);
-      rt_printk("Index of address %d device %d is %d", mag.address, mag.device, index);
+      // Find matching message in magnetic queue
+      int index = findIndexOfMagAddress(converter.magnetic_data);
+      rt_printk("Index of address %d device %d is %d", converter.magnetic_data.address, converter.magnetic_data.device, index);
       if (index >= 0)
       {
         rt_sem_wait(&mag_sem[index]);
-        magnetic_msg_queue[index] = mag;
+        magnetic_msg_queue[index] = converter.magnetic_data;
         rt_sem_signal(&mag_sem[index]);
-        rt_printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
+        rt_printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", converter.magnetic_data.address, converter.magnetic_data.device, converter.magnetic_data.enable, converter.magnetic_data.control);
         send_ack(raw);
       }
       else if (magnetic_msg_count < MAG_MSQ_SIZE)
       {
+        // If not found, use next free slot
         rt_sem_wait(&mag_sem[magnetic_msg_count]);
-        magnetic_msg_queue[magnetic_msg_count] = mag;
+        magnetic_msg_queue[magnetic_msg_count] = converter.magnetic_data;
         rt_sem_signal(&mag_sem[magnetic_msg_count]);
         magnetic_msg_count++;
-        rt_printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
+        rt_printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", converter.magnetic_data.address, converter.magnetic_data.device, converter.magnetic_data.enable, converter.magnetic_data.control);
         send_ack(raw);
       }
       else
@@ -173,33 +216,44 @@ int fifo_handler(unsigned int fifo)
   return 0;
 }
 
+/**
+ * @brief Sends a bit-encoded message via a parallel port.
+ *
+ * This function transmits a message bit-by-bit using specific timing for logical '1' and '0'.
+ * It uses a semaphore (bit_sem) to ensure exclusive access to the communication channel (LPT1).
+ *
+ * @param message:           The message to send, where each bit is checked starting from the most significant bit.
+ * @param bit_message_length: The number of bits from the message to transmit.
+ */
 void send_bit_task(unsigned long long message, int bit_message_length)
 {
   RTIME bit_1_count = nano2count(BIT_1_TIME);
   RTIME bit_0_count = nano2count(BIT_0_TIME);
 
+  // Acquire semaphore to access parallel port LPT1.
   rt_sem_wait(&bit_sem);
   outb(0x00, LPT1);             // Set initial voltage level
   rt_sleep(nano2count(500000)); // Wait 0.5ms
   int i;
   for (i = 0; i < bit_message_length; i++)
   {
-    if (((message >> (63 - i)) & 0x01) == 1) // 1-bit
+    // Check if the current bit (starting from the MSB) is 1
+    if (((message >> (63 - i)) & 0x01) == 1)
     {
-      outb(0x11, LPT1);
-      rt_sleep(bit_1_count);
-      outb(0x00, LPT1);
-      rt_sleep(bit_1_count);
+      outb(0x11, LPT1);      // Set output high
+      rt_sleep(bit_1_count); // Delay for 58µs
+      outb(0x00, LPT1);      // Set output low
+      rt_sleep(bit_1_count); // Delay for 58µs
     }
     else // 0-bit
     {
-      outb(0x11, LPT1);
-      rt_sleep(bit_0_count);
-      outb(0x00, LPT1);
-      rt_sleep(bit_0_count);
+      outb(0x11, LPT1);      // Set output high
+      rt_sleep(bit_0_count); // Delay for 100µs
+      outb(0x00, LPT1);      // Set output low
+      rt_sleep(bit_0_count); // Delay for 100µs
     }
   }
-  outb(0x11, LPT1);
+  outb(0x11, LPT1); // Final pulse
   rt_sem_signal(&bit_sem);
 }
 
@@ -253,8 +307,7 @@ unsigned long long buildMagneticTelegram(MagneticData data)
       .stop_bit = 1,                // Fixed stop bit
       .reserved = 0                 // Reserved field, set to 0
   };
-  MagneticConverter converter;
-  converter.magnetic_telegram = telegram;
+  MagneticConverter converter = {.magnetic_telegram = telegram};
 
   return converter.unsigned_long_long;
 }
@@ -299,14 +352,12 @@ unsigned long long buildLocomotiveTelegram(LocomotiveData data)
       .stop_bit = 1,                // Stop bit
       .reserved = 0,                // Reserved field
   };
-  LocomotiveConverter converter;
-  converter.locomotive_telegram = telegram;
+  LocomotiveConverter converter = {.locomotive_telegram = telegram};
 
   return converter.unsigned_long_long;
 }
 
 /**
- * @function buildIdleTelegram
  * @brief Constructs and initializes an IdleTelegram structure.
  *
  * This function creates and initializes an IdleTelegram structure with the fixed
@@ -330,14 +381,12 @@ unsigned long long buildIdleTelegram(void)
       .reserved = 0                 // Reserved field, set to 0.
   };
 
-  IdleConverter converter;
-  converter.idle_telegram = telegram;
+  IdleConverter converter = {.idle_telegram = telegram};
 
   return converter.unsigned_long_long;
 }
 
 /**
- * @function buildResetAllTelegram
  * @brief Constructs and initializes a ResetAllTelegram structure.
  *
  * This function creates and initializes a ResetAllTelegram structure with the fixed
@@ -361,14 +410,27 @@ unsigned long long buildResetAllTelegram(void)
       .reserved = 0                 // Reserved field, set to 0
   };
 
-  ResetConverter converter;
-  converter.reset_telegram = telegram;
+  ResetConverter converter = {.reset_telegram = telegram};
 
   return converter.unsigned_long_long;
 }
 
-void send_magnetic_msg_task(long arg)
+/**
+ * @brief Task responsible for continuously sending magnetic messages.
+ *
+ * This function runs an infinite loop that monitors the magnetic message queue.
+ * When there is at least one message available, it:
+ *   - Waits for semaphore synchronization to safely access the magnetic message queue.
+ *   - Builds a telegram from the current magnetic message.
+ *   - Releases the semaphore.
+ *   - Sends the built telegram using the send_bit_task function.
+ *   - Shifts all remaining messages in the queue one position forward to remove
+ *     the sent message, and decrements the magnetic message count.
+ * Finally, the task waits until the next cycle using rt_task_wait_period().
+ */
+void send_magnetic_msg_task(void) // TODO: if not working then add (long arg)
 {
+  rt_printk("Starting magnetic msg task");
   while (1)
   {
     if (magnetic_msg_count > 0)
@@ -378,10 +440,9 @@ void send_magnetic_msg_task(long arg)
       rt_sem_signal(&mag_sem[0]);
       send_bit_task(telegram, BIT_MESSAGE_LENGTH);
 
-      // Shift queue elements
+      // Shift messages up in the queue
       int i;
-      MagneticDataConverter converter;
-      converter.unsigned_short = 0;
+      MagneticDataConverter converter = {.unsigned_short = 0};
       for (i = 1; i < magnetic_msg_count; i++)
       {
         magnetic_msg_queue[i - 1] = magnetic_msg_queue[i];
@@ -393,8 +454,22 @@ void send_magnetic_msg_task(long arg)
   }
 }
 
+/**
+ * @brief Task responsible for continuously sending locomotive messages.
+ *
+ * This function runs an infinite loop that sends one of the locomotive messages
+ * for which locomotive is defined by the parameter i that is provided to the function:
+ *   - It waits on the corresponding semaphore (loc_sem[i]) to safely access the locomotive message data.
+ *   - It builds a telegram using the message from the locomotive_msg_queue at index i.
+ *   - It signals the semaphore to release it after reading the message.
+ *   - It sends the built telegram using send_bit_task, with a fixed message length defined by BIT_MESSAGE_LENGTH.
+ *
+ * @param i: An integer representing the index into loc_sem and locomotive_msg_queue arrays. Must be
+ *           within the range [0, LOC_MSQ_SIZE) to ensure valid access.
+ */
 void send_loco_msg_task(long i)
 {
+  rt_printk("Starting locomotive msg task %d", i);
   while (1)
   {
     if (i >= 0 && i < LOC_MSQ_SIZE)
@@ -408,7 +483,15 @@ void send_loco_msg_task(long i)
   }
 }
 
-void send_init_dcc(long j)
+/**
+ * @brief Initialize the DCC system by transmitting reset and idle telegrams.
+ *
+ * This function performs the following steps:
+ *  1. Sends the reset telegram repeatedly (20 times) to ensure that all devices
+ *    in the system are reset.
+ *  2. Sends the idle telegram repeatedly (10 times) to place the system in a stable, idle state.
+ */
+void send_init_dcc(void) // TODO: if not working then add (long arg)
 {
   rt_printk("Start initialization of dcc system...\n");
   unsigned long long reset_msg = buildResetAllTelegram();
@@ -417,12 +500,10 @@ void send_init_dcc(long j)
   for (i = 0; i < 20; i++)
   {
     send_bit_task(reset_msg, BIT_MESSAGE_LENGTH);
-    rt_printk(".");
   }
   for (i = 0; i < 10; i++)
   {
     send_bit_task(idle_msg, BIT_MESSAGE_LENGTH);
-    rt_printk(".");
   }
   rt_printk("Initialization of dcc system finished\n");
 }
@@ -432,6 +513,9 @@ static __init int send_init(void)
   rt_printk("Start loading module...");
   int i;
   int ret = 0;
+  int task_make_res;
+  int fifo_create_res;
+  int task_init_res;
   rt_mount();
 
   rt_printk("Initialize sem");
@@ -446,7 +530,7 @@ static __init int send_init(void)
   }
 
   rt_printk("Create FIFO Channel %d with size %d", FIFO_CMD, FIFO_SIZE);
-  int fifo_create_res = rtf_create(FIFO_CMD, FIFO_SIZE);
+  fifo_create_res = rtf_create(FIFO_CMD, FIFO_SIZE);
   if (fifo_create_res != 0)
   {
     rt_printk("Failed to create cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_create_res);
@@ -468,30 +552,33 @@ static __init int send_init(void)
     ret = -1;
   }
 
-  int task_init_res;
   task_init_res = rt_task_init(&init_task, send_init_dcc, 0, STACK_SIZE, 1, 0, 0);
-  task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 3, 0, 0);
   if (task_init_res != 0)
   {
-    rt_printk("Failed to init magnetic task with %d!\n", task_init_res);
+    rt_printk("Failed to init 'inti' task with %d!\n", task_init_res);
     ret = -1;
   }
+  // task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 3, 0, 0);
+  // if (task_init_res != 0)
+  // {
+  //   rt_printk("Failed to init 'magnetic' task with %d!\n", task_init_res);
+  //   ret = -1;
+  // }
+  // Initializes for each locomotive its own periodic task with
+  // the task pointer, the function, the index of the current loc which specify for which loc the task is responsible for, the Stack size, priority
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
-    task_init_res = rt_task_init(&loco_tasks[i], send_loco_msg_task, 0, STACK_SIZE, 2, 0, 0);
+    task_init_res = rt_task_init(&loco_tasks[i], send_loco_msg_task, i, STACK_SIZE, 2, 0, 0);
     if (task_init_res != 0)
     {
-      rt_printk("Failed to init locomotive %d task with %d!\n", i, task_init_res);
+      rt_printk("Failed to init 'locomotive %d' task with %d!\n", i, task_init_res);
       ret = -1;
     }
   }
 
-  // rt_set_periodic_mode();
-  // start_rt_timer(nano2count(PERIOD_TIMER));
   rt_set_oneshot_mode();
   start_rt_timer(nano2count(PERIOD_TIMER));
 
-  int task_make_res;
   rt_printk("Make one shot task 'init'\n");
   task_make_res = rt_task_make_periodic(&init_task, rt_get_time() + nano2count(10000000), 0);
   if (task_make_res != 0)
@@ -499,13 +586,13 @@ static __init int send_init(void)
     rt_printk("Failed to make one shot init task with %d!\n", task_make_res);
     ret = -1;
   }
-  rt_printk("Make periodic task 'mag'\n");
-  task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
-  if (task_make_res != 0)
-  {
-    rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
-    ret = -1;
-  }
+  // rt_printk("Make periodic task 'mag'\n");
+  // task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
+  // if (task_make_res != 0)
+  // {
+  //   rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
+  //   ret = -1;
+  // }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
     rt_printk("Make periodic task 'loc %d'\n", i);
@@ -530,7 +617,7 @@ static __exit void send_exit(void)
   stop_rt_timer();
 
   rt_task_delete(&init_task);
-  rt_task_delete(&magnetic_task);
+  // rt_task_delete(&magnetic_task);
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
     rt_task_delete(&loco_tasks[i]);
