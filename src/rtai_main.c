@@ -308,11 +308,11 @@ void send_loco_msg_task(long i)
 static __init int send_init(void)
 {
   rt_printk("Start loading module...");
+  int i;
   int ret = 0;
   rt_mount();
 
   rt_sem_init(&bit_sem, 1);
-  int i;
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
     rt_sem_init(&loc_sem[i], 1);
@@ -396,10 +396,11 @@ static __init int send_init(void)
 static __exit void send_exit(void)
 {
   rt_printk("Start unloading module...");
+  int i;
+
   // stop_rt_timer();
 
   // rt_task_delete(&magnetic_task);
-  // int i;
   // for (i = 0; i < LOC_MSQ_SIZE; i++)
   // {
   //   rt_task_delete(&loco_tasks[i]);
