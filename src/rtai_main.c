@@ -134,7 +134,8 @@ int fifo_handler(unsigned int fifo)
       // Magnetic
       MagneticData mag = converter.magnetic_data;
 
-      int index = findIndexOfMagAddress(loco);
+      int index = findIndexOfMagAddress(mag);
+      rt_printk("Index of address %d is %d", mag.address, index);
       if (index >= 0)
       {
         rt_sem_wait(&mag_sem[index]);
