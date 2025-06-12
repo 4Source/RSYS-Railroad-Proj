@@ -24,9 +24,9 @@
 #define MAG_MSQ_SIZE 4
 #define BIT_MESSAGE_LENGTH 42
 
-SEM bit_sem;
-SEM loc_sem[LOC_MSQ_SIZE];
-SEM mag_sem[MAG_MSQ_SIZE];
+static SEM bit_sem;
+static SEM loc_sem[LOC_MSQ_SIZE];
+static SEM mag_sem[MAG_MSQ_SIZE];
 
 RT_TASK loco_tasks[LOC_MSQ_SIZE];
 RT_TASK magnetic_task;
@@ -170,10 +170,10 @@ void send_bit_task(unsigned long long message, int bit_message_length)
   RTIME bit_1_count = nano2count(BIT_1_TIME);
   RTIME bit_0_count = nano2count(BIT_0_TIME);
 
+  rt_sem_wait(&bit_sem);
   outb(0x00, LPT1);             // Set initial voltage level
   rt_sleep(nano2count(500000)); // Wait 0.5ms
   int i;
-  rt_sem_wait(&bit_sem);
   for (i = 0; i < bit_message_length; i++)
   {
     if (((message >> (63 - i)) & 0x01) == 1) // 1-bit
@@ -191,8 +191,8 @@ void send_bit_task(unsigned long long message, int bit_message_length)
       rt_sleep(bit_0_count);
     }
   }
-  rt_sem_signal(&bit_sem);
   outb(0x11, LPT1);
+  rt_sem_signal(&bit_sem);
 }
 
 /**
