@@ -481,14 +481,14 @@ static __init int send_init(void)
     }
   }
 
-  rt_set_periodic_mode();
+  // rt_set_periodic_mode();
+  // start_rt_timer(nano2count(PERIOD_TIMER));
+  rt_set_oneshot_mode();
   start_rt_timer(nano2count(PERIOD_TIMER));
-  // rt_set_oneshot_mode();
-  // start_rt_timer(0);
 
   int task_make_res;
   rt_printk("Make one shot task 'init'\n");
-  task_make_res = rt_task_resume(&init_task);
+  task_make_res = rt_task_make_periodic(&init_task, rt_get_time() + nano2count(10000000), 0);
   if (task_make_res != 0)
   {
     rt_printk("Failed to make one shot init task with %d!\n", task_make_res);
@@ -524,6 +524,7 @@ static __exit void send_exit(void)
 
   stop_rt_timer();
 
+  rt_task_delete(&init_task);
   // rt_task_delete(&magnetic_task);
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
