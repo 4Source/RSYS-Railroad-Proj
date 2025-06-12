@@ -74,27 +74,16 @@ typedef struct
     unsigned long long preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
 } LocomotiveTelegram;
 
-/**
- * @brief Constructs a LocomotiveTelegram from the given LocomotiveData.
- *
- * This function takes a LocomotiveData structure as input and constructs
- * a corresponding LocomotiveTelegram structure for communication.
- *
- * @param data The LocomotiveData structure containing the locomotive data.
- * @return A LocomotiveTelegram structure constructed from the input data.
- */
-unsigned long long buildLocomotiveTelegram(LocomotiveData data);
-
 typedef union LocomotiveConverter
 {
-    LocomotiveTelegram lt;
-    unsigned long long ull;
+    LocomotiveTelegram locomotive_telegram;
+    unsigned long long unsigned_long_long;
 } LocomotiveConverter;
 
 typedef union LocomotiveDataConverter
 {
-    LocomotiveData ld;
-    unsigned short us;
+    LocomotiveData locomotive_data;
+    unsigned short unsigned_short;
 } LocomotiveDataConverter;
 
 #endif

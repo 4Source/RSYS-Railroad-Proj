@@ -76,27 +76,16 @@ typedef struct
     unsigned long long preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
 } MagneticTelegram;
 
-/**
- * @brief Constructs a MagneticTelegram from the given MagneticData.
- *
- * This function takes a MagneticData structure as input and constructs
- * a corresponding MagneticTelegram structure for communication.
- *
- * @param data The MagneticData structure containing the magnetic data.
- * @return A MagneticTelegram structure constructed from the input data.
- */
-unsigned long long buildMagneticTelegram(MagneticData data);
-
 typedef union MagneticConverter
 {
-    MagneticTelegram mt;
-    unsigned long long ull;
+    MagneticTelegram magnetic_telegram;
+    unsigned long long unsigned_long_long;
 } MagneticConverter;
 
 typedef union MagneticDataConverter
 {
-    MagneticData md;
-    unsigned short us;
+    MagneticData magnetic_data;
+    unsigned short unsigned_short;
 } MagneticDataConverter;
 
 #endif
