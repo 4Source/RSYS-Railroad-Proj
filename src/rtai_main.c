@@ -28,6 +28,7 @@ SEM mag_sem[MAG_MSQ_SIZE];
 
 RT_TASK loco_tasks[LOC_MSQ_SIZE];
 RT_TASK magnetic_task;
+RT_TASK init_task;
 
 int magnetic_msg_count = 0;
 LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
@@ -294,6 +295,68 @@ unsigned long long buildLocomotiveTelegram(LocomotiveData data)
   return converter.unsigned_long_long;
 }
 
+/**
+ * @function buildIdleTelegram
+ * @brief Constructs and initializes an IdleTelegram structure.
+ *
+ * This function creates and initializes an IdleTelegram structure with the fixed
+ * values defined for a Digital Decoder Idle Packet. The structure adheres to the
+ * format specified in the documentation and ensures proper synchronization and
+ * error detection.
+ *
+ * @return IdleTelegram A fully initialized idle telegram structure.
+ */
+unsigned long long buildIdleTelegram()
+{
+  IdleTelegram telegram = {
+      .preamble = 0b11111111111111, // Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
+      .start_bit_address = 0,       // Start bit for the address field. Fixed value: 0.
+      .address = 0xFF,              // Address field. Fixed value: 0b11111111 (0xFF) (idle packet address).
+      .start_bit_cmd = 0,           // Start bit for the command field. Fixed value: 0.
+      .command = 0,                 // Command field. Fixed value: 0 (Idle command).
+      .start_bit_cs = 0,            // Start bit for the checksum field. Fixed value: 0.
+      .checksum = 0xFF,             // Checksum value.
+      .stop_bit = 1,                // Stop bit of the telegram. Fixed value: 1.
+      .reserved = 0                 // Reserved field, set to 0.
+  };
+
+  IdleConverter converter;
+  converter.idle_telegram = telegram;
+
+  return converter.unsigned_long_long;
+}
+
+/**
+ * @function buildResetAllTelegram
+ * @brief Constructs and initializes a ResetAllTelegram structure.
+ *
+ * This function creates and initializes a ResetAllTelegram structure with the fixed
+ * values defined for a Digital Decoder Reset Packet. The structure adheres to the
+ * format specified in the documentation and ensures proper synchronization and
+ * error detection.
+ *
+ * @return ResetAllTelegram A fully initialized reset telegram structure.
+ */
+unsigned long long buildResetAllTelegram()
+{
+  ResetAllTelegram telegram = {
+      .preamble = 0b11111111111111, // Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
+      .start_bit_address = 0,       // Start bit for the address field. Fixed value: 0.
+      .address = 0,                 // Address field. Fixed value: 0 (broadcast address).
+      .start_bit_cmd = 0,           // Start bit for the command field. Fixed value: 0.
+      .command = 0,                 // Command field. Fixed value: 0 (Reset command).
+      .start_bit_cs = 0,            // Start bit for the checksum field. Fixed value: 0.
+      .checksum = 0,                // Checksum value.
+      .stop_bit = 1,                // Stop bit of the telegram. Fixed value: 1.
+      .reserved = 0                 // Reserved field, set to 0
+  };
+
+  ResetConverter converter;
+  converter.reset_telegram = telegram;
+
+  return converter.unsigned_long_long;
+}
+
 void send_magnetic_msg_task(long arg)
 {
   while (1)
@@ -338,6 +401,23 @@ void send_loco_msg_task(long i)
   }
 }
 
+void send_init_dcc(long j)
+{
+  rt_printk("Start initialization of dcc system...");
+  unsigned long long reset_msg = buildResetAllTelegram();
+  unsigned long long idle_msg = buildIdleTelegram();
+  int i;
+  for (i = 0; i < 20; i++)
+  {
+    send_bit_task(reset_msg, BIT_MESSAGE_LENGTH);
+  }
+  for (i = 0; i < 10; i++)
+  {
+    send_bit_task(idle_msg, BIT_MESSAGE_LENGTH);
+  }
+  rt_printk("Initialization of dcc system finished");
+}
+
 static __init int send_init(void)
 {
   rt_printk("Start loading module...");
@@ -345,7 +425,8 @@ static __init int send_init(void)
   int ret = 0;
   rt_mount();
 
-  rt_sem_init(&bit_sem, 1);
+  rt_printk("Initialize sem")
+      rt_sem_init(&bit_sem, 1);
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
     rt_sem_init(&loc_sem[i], 1);
@@ -379,7 +460,8 @@ static __init int send_init(void)
   }
 
   int task_init_res;
-  // int task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
+  task_init_res = rt_task_init(&init_task, send_init_dcc, 0, STACK_SIZE, 1, 0, 0);
+  // task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 3, 0, 0);
   if (task_init_res != 0)
   {
     rt_printk("Failed to init magnetic task with %d!\n", task_init_res);
@@ -387,7 +469,7 @@ static __init int send_init(void)
   }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
-    task_init_res = rt_task_init(&loco_tasks[i], send_loco_msg_task, 0, STACK_SIZE, 1, 0, 0);
+    task_init_res = rt_task_init(&loco_tasks[i], send_loco_msg_task, 0, STACK_SIZE, 2, 0, 0);
     if (task_init_res != 0)
     {
       rt_printk("Failed to init locomotive %d task with %d!\n", i, task_init_res);
@@ -395,11 +477,14 @@ static __init int send_init(void)
     }
   }
 
-  rt_set_periodic_mode();
-  start_rt_timer(nano2count(PERIOD_TIMER));
+  // rt_set_periodic_mode();
+  // start_rt_timer(nano2count(PERIOD_TIMER));
+  rt_set_oneshot_mode();
+  start_rt_timer(0);
 
   int task_make_res;
-  // int task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
+  task_make_res = rt_task_resume(&init_task);
+  // task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
   if (task_make_res != 0)
   {
     rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);

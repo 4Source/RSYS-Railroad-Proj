@@ -33,17 +33,10 @@ typedef struct
     unsigned long long preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
 } IdleTelegram;
 
-/**
- * @function buildIdleTelegram
- * @brief Constructs and initializes an IdleTelegram structure.
- *
- * This function creates and initializes an IdleTelegram structure with the fixed
- * values defined for a Digital Decoder Idle Packet. The structure adheres to the
- * format specified in the documentation and ensures proper synchronization and
- * error detection.
- *
- * @return IdleTelegram A fully initialized idle telegram structure.
- */
-IdleTelegram buildIdleTelegram();
+typedef union IdleConverter
+{
+    IdleTelegram idle_telegram;
+    unsigned long long unsigned_long_long;
+} IdleConverter;
 
 #endif

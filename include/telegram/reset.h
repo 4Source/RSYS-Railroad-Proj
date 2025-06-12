@@ -35,17 +35,10 @@ typedef struct
     unsigned long long preamble : 14;         // [bit 50 - 63]    Preamble for synchronization. Fixed 14-bit value: 0b11111111111111 (0x3FFF).
 } ResetAllTelegram;
 
-/**
- * @function buildResetAllTelegram
- * @brief Constructs and initializes a ResetAllTelegram structure.
- *
- * This function creates and initializes a ResetAllTelegram structure with the fixed
- * values defined for a Digital Decoder Reset Packet. The structure adheres to the
- * format specified in the documentation and ensures proper synchronization and
- * error detection.
- *
- * @return ResetAllTelegram A fully initialized reset telegram structure.
- */
-ResetAllTelegram buildResetAllTelegram();
+typedef union ResetConverter
+{
+    ResetAllTelegram reset_telegram;
+    unsigned long long unsigned_long_long;
+} ResetConverter;
 
 #endif
