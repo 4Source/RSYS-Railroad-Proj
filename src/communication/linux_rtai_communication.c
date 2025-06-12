@@ -15,8 +15,8 @@ int send_with_ack(unsigned short data, int attempts)
     if (fd_cmd < 0)
     {
         // If the command FIFO can't be opened, log the error
-        printf("Failed to open command fifo!\n");
-        return -1;
+        printf("Failed to open command fifo with %d!\n", fd_cmd);
+        return fd_cmd;
     }
 
     // Open the acknowledgment FIFO in read-only, non-blocking mode
@@ -24,9 +24,9 @@ int send_with_ack(unsigned short data, int attempts)
     if (fd_ack < 0)
     {
         // If the acknowledgment FIFO can't be opened, log the error, close the command FIFO
-        printf("Failed to open acknowledge fifo!");
+        printf("Failed to open acknowledge fifo with %d!", fd_ack);
         close(fd_cmd);
-        return -1;
+        return fd_ack;
     }
 
     // Attempt to send the command multiple times (up to 'attempts')
