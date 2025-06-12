@@ -331,7 +331,7 @@ static __init int send_init(void)
   // }
   rt_printk("Create FIFO Channel %d with size %d", FIFO_CMD, FIFO_SIZE);
   int fifo_create_res = rtf_create(FIFO_CMD, FIFO_SIZE);
-  if (fifo_create_res - FIFO_SIZE != 0)
+  if (fifo_create_res != 0)
   {
     rt_printk("Failed to create cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_create_res);
     ret = -1;
@@ -350,7 +350,7 @@ static __init int send_init(void)
   // }
   // rt_printk("Create FIFO Channel %d with size %d", FIFO_ACK, FIFO_SIZE);
   // fifo_create_res = rtf_create(FIFO_ACK, FIFO_SIZE);
-  // if (fifo_create_res - FIFO_SIZE != 0)
+  // if (fifo_create_res != 0)
   // {
   //   rt_printk("Failed to create ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_create_res);
   //   ret = -1;
