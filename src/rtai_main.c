@@ -321,27 +321,29 @@ static __init int send_init(void)
     rt_sem_init(&mag_sem[i], 1);
   }
 
-  if (rtf_create(FIFO_CMD, FIFO_SIZE) - FIFO_SIZE != 0)
+  int fifo_res = rtf_create(FIFO_CMD, FIFO_SIZE);
+  if (fifo_res - FIFO_SIZE != 0)
   {
-    rt_printk("Failed to create cmd fifo!\n");
-    return -1;
+    rt_printk("Failed to create cmd fifo with %d!\n", fifo_res);
+    return fifo_res;
   }
   int handler_res = rtf_create_handler(FIFO_CMD, &fifo_handler);
   if (handler_res != 0)
   {
-    rt_printk("Failed to create cmd fifo handler!\n");
+    rt_printk("Failed to create cmd fifo handler with %d!\n", handler_res);
     return handler_res;
   }
-  if (rtf_create(FIFO_ACK, FIFO_SIZE) - FIFO_SIZE != 0)
+  fifo_res = rtf_create(FIFO_ACK, FIFO_SIZE);
+  if (fifo_res - FIFO_SIZE != 0)
   {
-    rt_printk("Failed to create ack fifo!\n");
-    return -1;
+    rt_printk("Failed to create ack fifo with %d!\n", fifo_res);
+    return fifo_res;
   }
 
   int task_init_res = rt_task_init(magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
   if (task_init_res != 0)
   {
-    rt_printk("Failed to init magnetic task!\n");
+    rt_printk("Failed to init magnetic task with %d!\n", task_init_res);
     return task_init_res;
   }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
@@ -349,7 +351,7 @@ static __init int send_init(void)
     task_init_res = rt_task_init(&loco_tasks[i], send_loco_msg_task, i, STACK_SIZE, 1, 0, 0);
     if (task_init_res != 0)
     {
-      rt_printk("Failed to init locomotive %d task!\n", i);
+      rt_printk("Failed to init locomotive %d task with %d!\n", i, task_init_res);
       return task_init_res;
     }
   }
@@ -360,7 +362,7 @@ static __init int send_init(void)
   int task_make_res = rt_task_make_periodic(magnetic_task, rt_get_time() + nano2count(1000000000), nano2count(PERIOD_MAG_TASK));
   if (task_make_res != 0)
   {
-    rt_printk("Failed to make periodic magnetic task!\n");
+    rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
     return task_make_res;
   }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
@@ -368,7 +370,7 @@ static __init int send_init(void)
     task_make_res = rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(1000000000), nano2count(PERIOD_LOC_TASK + i));
     if (task_make_res != 0)
     {
-      rt_printk("Failed to make periodic locomotive %d task!\n", i);
+      rt_printk("Failed to make periodic locomotive %d task with %d!\n", i, task_make_res);
       return task_make_res;
     }
   }
