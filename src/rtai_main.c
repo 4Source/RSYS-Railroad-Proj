@@ -12,8 +12,8 @@
 #define STACK_SIZE 4096
 #define FIFO_SIZE 1024
 #define PERIOD_TIMER 1000000
-#define PERIOD_MAG_TASK 50000000 // TODO:
-#define PERIOD_LOC_TASK 50000000 // TODO:
+#define PERIOD_MAG_TASK 5000000 // TODO:
+#define PERIOD_LOC_TASK 5000000 // TODO:
 
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
