@@ -60,6 +60,32 @@ void send_ack(unsigned short raw)
   }
 }
 
+int findIndexOfLocAddress(LocomotiveData loc)
+{
+  int i;
+  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  {
+    if (locomotive_msg_queue[i].address == loc.address)
+    {
+      return i;
+    }
+  }
+  return -1;
+}
+
+int findIndexOfMagAddress(MagneticData mag)
+{
+  int i;
+  for (i = 0; i < MAG_MSQ_SIZE; i++)
+  {
+    if (magnetic_msg_queue[i].address == mag.address && magnetic_msg_queue[i].device == mag.device)
+    {
+      return i;
+    }
+  }
+  return -1;
+}
+
 int fifo_handler(unsigned int fifo)
 {
   char command[FIFO_SIZE];
@@ -86,11 +112,12 @@ int fifo_handler(unsigned int fifo)
       // Locomotive
       LocomotiveData loco = converter.locomotive_data;
 
-      if (loco.address <= LOC_MSQ_SIZE && loco.address > 0)
+      int index = findIndexOfLocAddress(loco);
+      if (index >= 0)
       {
-        rt_sem_wait(&loc_sem[loco.address - 1]);
-        locomotive_msg_queue[loco.address - 1] = loco;
-        rt_sem_signal(&loc_sem[loco.address - 1]);
+        rt_sem_wait(&loc_sem[index]);
+        locomotive_msg_queue[index] = loco;
+        rt_sem_signal(&loc_sem[index]);
         printk("Locomotive Addr %d: Speed=%d Dir=%d Light=%d\n", loco.address, loco.speed, loco.direction, loco.light);
         send_ack(raw);
       }
@@ -106,12 +133,12 @@ int fifo_handler(unsigned int fifo)
       // Magnetic
       MagneticData mag = converter.magnetic_data;
 
-      if (magnetic_msg_count < MAG_MSQ_SIZE)
-      // TODO: override existing
+      int index = findIndexOfMagAddress(loco);
+      if (index >= 0)
       {
-        rt_sem_wait(&mag_sem[magnetic_msg_count]);
-        magnetic_msg_queue[magnetic_msg_count] = mag;
-        rt_sem_signal(&mag_sem[magnetic_msg_count]);
+        rt_sem_wait(&mag_sem[index]);
+        magnetic_msg_queue[index] = mag;
+        rt_sem_signal(&mag_sem[index]);
         magnetic_msg_count++;
         printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", mag.address, mag.device, mag.enable, mag.control);
         send_ack(raw);
