@@ -15,12 +15,12 @@
 #define FIFO_SIZE 1024
 #define PERIOD_TIMER 1000000
 #define PERIOD_MAG_TASK 50000000
-#define PERIOD_LOC_TASK 15000000
+#define PERIOD_LOC_TASK 5000000
 
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
 #define LPT1 0x378        /* Parallel port address */
-#define LOC_MSQ_SIZE 2
+#define LOC_MSQ_SIZE 1
 #define MAG_MSQ_SIZE 4
 #define BIT_MESSAGE_LENGTH 42
 
@@ -34,7 +34,7 @@ RT_TASK init_task;
 
 int magnetic_msg_count = 0;
 LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
-    {.address = 1, .light = 0, .direction = 0, .speed = 0},
+    // {.address = 1, .light = 0, .direction = 0, .speed = 0},
     // {.address = 2, .light = 0, .direction = 0, .speed = 0},
     {.address = 3, .light = 1, .direction = 1, .speed = 0},
 };
