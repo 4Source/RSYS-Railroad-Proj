@@ -11,7 +11,8 @@
 int send_with_ack(unsigned short data, int attempts)
 {
     // Open the command FIFO in write-only mode
-    int fd_cmd = rtf_open_sized(FIFO_CMD, O_WRONLY, SIZE);
+    int fd_cmd = open(FIFO_CMD, O_WRONLY);
+    //int fd_cmd = rtf_open_sized(FIFO_CMD, O_WRONLY, SIZE);
     if (fd_cmd < 0)
     {
         // If the command FIFO can't be opened, log the error
@@ -20,7 +21,8 @@ int send_with_ack(unsigned short data, int attempts)
     }
 
     // Open the acknowledgment FIFO in read-only, non-blocking mode
-    int fd_ack = rtf_open_sized(FIFO_ACK, O_RDONLY | O_NONBLOCK, SIZE);
+    int fd_cmd = open(O_RDONLY | O_NONBLOCK);
+    //int fd_ack = rtf_open_sized(FIFO_ACK, O_RDONLY | O_NONBLOCK, SIZE);
     if (fd_ack < 0)
     {
         // If the acknowledgment FIFO can't be opened, log the error, close the command FIFO
