@@ -380,7 +380,7 @@ void send_magnetic_msg_task(long arg)
       for (i = 1; i < magnetic_msg_count; i++)
       {
         magnetic_msg_queue[i - 1] = magnetic_msg_queue[i];
-        magnetic_msg_queue[i] = converter.unsigned_short;
+        magnetic_msg_queue[i] = converter.magnetic_data;
       }
       magnetic_msg_count--;
     }
