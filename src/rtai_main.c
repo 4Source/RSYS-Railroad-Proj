@@ -465,7 +465,7 @@ static __init int send_init(void)
 
   int task_init_res;
   task_init_res = rt_task_init(&init_task, send_init_dcc, 0, STACK_SIZE, 1, 0, 0);
-  // task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 3, 0, 0);
+  task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 3, 0, 0);
   if (task_init_res != 0)
   {
     rt_printk("Failed to init magnetic task with %d!\n", task_init_res);
@@ -495,12 +495,12 @@ static __init int send_init(void)
     ret = -1;
   }
   rt_printk("Make periodic task 'mag'\n");
-  // task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
-  // if (task_make_res != 0)
-  // {
-  //   rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
-  //   ret = -1;
-  // }
+  task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
+  if (task_make_res != 0)
+  {
+    rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
+    ret = -1;
+  }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
     rt_printk("Make periodic task 'loc %d'\n", i);
@@ -525,7 +525,7 @@ static __exit void send_exit(void)
   stop_rt_timer();
 
   rt_task_delete(&init_task);
-  // rt_task_delete(&magnetic_task);
+  rt_task_delete(&magnetic_task);
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
     rt_task_delete(&loco_tasks[i]);
