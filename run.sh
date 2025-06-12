@@ -14,7 +14,7 @@ done
 
 # Run make command to build the module
 echo "Building the module..."
-make
+make || { echo "Build failed."; exit 1; }
 
 # Remove old module if present
 MODULE_NAME=("rtai_main")

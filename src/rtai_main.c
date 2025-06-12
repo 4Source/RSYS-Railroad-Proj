@@ -18,7 +18,7 @@
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
 #define LPT1 0x378        /* Parallel port address */
-#define LOC_MSQ_SIZE 1
+#define LOC_MSQ_SIZE 2
 #define MAG_MSQ_SIZE 4
 #define BIT_MESSAGE_LENGTH 42
 
@@ -32,7 +32,7 @@ RT_TASK magnetic_task;
 const int locomotive_count = 3;
 int magnetic_msg_count = 0;
 LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
-    // {.address = 1, .light = 0, .direction = 0, .speed = 0},
+    {.address = 1, .light = 0, .direction = 0, .speed = 0},
     // {.address = 2, .light = 0, .direction = 0, .speed = 0},
     {.address = 3, .light = 1, .direction = 1, .speed = 15},
 };

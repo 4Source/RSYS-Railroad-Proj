@@ -11,6 +11,12 @@ Locomotive locomotives_user[] = {
                           .light = 1,
                           .speed = 0,
                       }},
+    {.alias = "loc1", .data = {
+                          .address = 1,
+                          .direction = 1,
+                          .light = 1,
+                          .speed = 0,
+                      }},
 };
 
 Magnetic magnetic_user[] = {
