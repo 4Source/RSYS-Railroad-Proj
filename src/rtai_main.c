@@ -70,9 +70,9 @@ int fifo_handler(unsigned int fifo)
   rt_printk("Fifo handler: Got %d", r);
   if (r >= sizeof(unsigned short))
   {
-    // memcpy(&raw, command, sizeof(unsigned short)); // TODO:
-    command[r] = 0;
-    sscanf(command, "%d", &raw);
+    memcpy(&raw, command, sizeof(unsigned short));
+    // command[r] = 0;
+    // sscanf(command, "%d", &raw);
     rt_printk("Received command: %d", raw);
 
     // Check type (bits 13-14)
