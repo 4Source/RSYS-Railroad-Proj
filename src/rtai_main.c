@@ -330,12 +330,14 @@ static __init int send_init(void)
   if (fifo_create_res - FIFO_SIZE != 0)
   {
     rt_printk("Failed to create cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_create_res);
+    rt_umount_rtai();
     return fifo_create_res;
   }
   int handler_res = rtf_create_handler(FIFO_CMD, &fifo_handler);
   if (handler_res != 0)
   {
     rt_printk("Failed to create cmd fifo handler with %d!\n", handler_res);
+    rt_umount_rtai();
     return handler_res;
   }
   fifo_destroy_res = rtf_destroy(FIFO_ACK);
@@ -347,6 +349,7 @@ static __init int send_init(void)
   if (fifo_create_res - FIFO_SIZE != 0)
   {
     rt_printk("Failed to create ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_create_res);
+    rt_umount_rtai();
     return fifo_create_res;
   }
 
@@ -354,6 +357,7 @@ static __init int send_init(void)
   if (task_init_res != 0)
   {
     rt_printk("Failed to init magnetic task with %d!\n", task_init_res);
+    rt_umount_rtai();
     return task_init_res;
   }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
@@ -362,6 +366,7 @@ static __init int send_init(void)
     if (task_init_res != 0)
     {
       rt_printk("Failed to init locomotive %d task with %d!\n", i, task_init_res);
+      rt_umount_rtai();
       return task_init_res;
     }
   }
@@ -373,6 +378,7 @@ static __init int send_init(void)
   if (task_make_res != 0)
   {
     rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
+    rt_umount_rtai();
     return task_make_res;
   }
   for (i = 0; i < LOC_MSQ_SIZE; i++)
@@ -381,6 +387,7 @@ static __init int send_init(void)
     if (task_make_res != 0)
     {
       rt_printk("Failed to make periodic locomotive %d task with %d!\n", i, task_make_res);
+      rt_umount_rtai();
       return task_make_res;
     }
   }
