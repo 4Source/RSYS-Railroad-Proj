@@ -17,7 +17,7 @@ echo "Building the module..."
 make
 
 # Remove old module if present
-MODULE_NAME=("rtai_module")
+MODULE_NAME=("rtai_main")
 for (( idx=${#MODULE_NAME[@]}-1; idx>=0; idx-- )); do
     MODULE="${MODULE_NAME[idx]}"
     if lsmod | grep "$MODULE" &> /dev/null; then
