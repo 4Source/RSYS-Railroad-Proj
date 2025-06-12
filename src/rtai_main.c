@@ -314,27 +314,29 @@ static __init int send_init(void)
   int ret = 0;
   rt_mount();
 
-  rt_sem_init(&bit_sem, 1);
-  for (i = 0; i < LOC_MSQ_SIZE; i++)
-  {
-    rt_sem_init(&loc_sem[i], 1);
-  }
-  for (i = 0; i < MAG_MSQ_SIZE; i++)
-  {
-    rt_sem_init(&mag_sem[i], 1);
-  }
+  // rt_sem_init(&bit_sem, 1);
+  // for (i = 0; i < LOC_MSQ_SIZE; i++)
+  // {
+  //   rt_sem_init(&loc_sem[i], 1);
+  // }
+  // for (i = 0; i < MAG_MSQ_SIZE; i++)
+  // {
+  //   rt_sem_init(&mag_sem[i], 1);
+  // }
 
   // int fifo_destroy_res = rtf_destroy(FIFO_CMD);
   // if (fifo_destroy_res < 0)
   // {
   //   rt_printk("Failed to destroy cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_destroy_res);
   // }
+  rt_printk("Create FIFO Channel %d with size %d", FIFO_CMD, FIFO_SIZE);
   int fifo_create_res = rtf_create(FIFO_CMD, FIFO_SIZE);
   if (fifo_create_res - FIFO_SIZE != 0)
   {
     rt_printk("Failed to create cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_create_res);
     ret = -1;
   }
+  rt_printk("Create FIFO handler for Channel %d", FIFO_CMD);
   int handler_res = rtf_create_handler(FIFO_CMD, &fifo_handler);
   if (handler_res != 0)
   {
@@ -346,6 +348,7 @@ static __init int send_init(void)
   // {
   //   rt_printk("Failed to destroy ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_destroy_res);
   // }
+  // rt_printk("Create FIFO Channel %d with size %d", FIFO_ACK, FIFO_SIZE);
   // fifo_create_res = rtf_create(FIFO_ACK, FIFO_SIZE);
   // if (fifo_create_res - FIFO_SIZE != 0)
   // {
@@ -406,18 +409,18 @@ static __exit void send_exit(void)
   //   rt_task_delete(&loco_tasks[i]);
   // }
 
-  rtf_destroy(FIFO_ACK);
+  // rtf_destroy(FIFO_ACK);
   rtf_destroy(FIFO_CMD);
 
-  rt_sem_delete(&bit_sem);
-  for (i = 0; i < LOC_MSQ_SIZE; i++)
-  {
-    rt_sem_delete(&loc_sem[i]);
-  }
-  for (i = 0; i < MAG_MSQ_SIZE; i++)
-  {
-    rt_sem_delete(&mag_sem[i]);
-  }
+  // rt_sem_delete(&bit_sem);
+  // for (i = 0; i < LOC_MSQ_SIZE; i++)
+  // {
+  //   rt_sem_delete(&loc_sem[i]);
+  // }
+  // for (i = 0; i < MAG_MSQ_SIZE; i++)
+  // {
+  //   rt_sem_delete(&mag_sem[i]);
+  // }
 
   rt_umount();
   rt_printk("Unloading module\n");
