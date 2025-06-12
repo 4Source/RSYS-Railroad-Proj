@@ -18,7 +18,7 @@
 #define BIT_1_TIME 58000  /* 58 microseconds */
 #define BIT_0_TIME 100000 /* 100 microseconds */
 #define LPT1 0x378        /* Parallel port address */
-#define LOC_MSQ_SIZE 3
+#define LOC_MSQ_SIZE 1
 #define MAG_MSQ_SIZE 4
 #define BIT_MESSAGE_LENGTH 42
 
@@ -32,8 +32,8 @@ RT_TASK magnetic_task;
 const int locomotive_count = 3;
 int magnetic_msg_count = 0;
 LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
-    {.address = 1, .light = 0, .direction = 0, .speed = 0},
-    {.address = 2, .light = 0, .direction = 0, .speed = 0},
+    // {.address = 1, .light = 0, .direction = 0, .speed = 0},
+    // {.address = 2, .light = 0, .direction = 0, .speed = 0},
     {.address = 3, .light = 1, .direction = 1, .speed = 15},
 };
 MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {
@@ -350,7 +350,7 @@ static __init int send_init(void)
     ret = -1;
   }
 
-  int task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
+  // int task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
   if (task_init_res != 0)
   {
     rt_printk("Failed to init magnetic task with %d!\n", task_init_res);
@@ -369,7 +369,7 @@ static __init int send_init(void)
   rt_set_periodic_mode();
   start_rt_timer(nano2count(PERIOD_TIMER));
 
-  int task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
+  // int task_make_res = rt_task_make_periodic(&magnetic_task, rt_get_time() + nano2count(10000000), nano2count(PERIOD_MAG_TASK));
   if (task_make_res != 0)
   {
     rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
@@ -397,7 +397,7 @@ static __exit void send_exit(void)
 
   stop_rt_timer();
 
-  rt_task_delete(&magnetic_task);
+  // rt_task_delete(&magnetic_task);
   for (i = 0; i < LOC_MSQ_SIZE; i++)
   {
     rt_task_delete(&loco_tasks[i]);
