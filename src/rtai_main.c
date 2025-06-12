@@ -62,14 +62,16 @@ void send_ack(unsigned short raw)
 
 int fifo_handler(unsigned int fifo)
 {
-  char command[1024];
+  char command[FIFO_SIZE];
   int r;
   unsigned short raw;
 
   r = rtf_get(FIFO_CMD, command, sizeof(command) - 1);
   if (r >= sizeof(unsigned short))
   {
-    memcpy(&raw, command, sizeof(unsigned short));
+    // memcpy(&raw, command, sizeof(unsigned short)); // TODO:
+    command[r] = 0;
+    sscanf(command, "%d", &raw);
 
     // Check type (bits 13-14)
     unsigned short type = (raw >> 13) & 0x3;
@@ -322,12 +324,11 @@ static __init int send_init(void)
     rt_sem_init(&mag_sem[i], 1);
   }
 
-  int fifo_destroy_res = rtf_destroy(FIFO_CMD);
-  if (fifo_destroy_res < 0)
-  {
-    rt_printk("Failed to destroy cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_destroy_res);
-    ret = -1;
-  }
+  // int fifo_destroy_res = rtf_destroy(FIFO_CMD);
+  // if (fifo_destroy_res < 0)
+  // {
+  //   rt_printk("Failed to destroy cmd fifo (channel %d) with %d!\n", FIFO_CMD, fifo_destroy_res);
+  // }
   int fifo_create_res = rtf_create(FIFO_CMD, FIFO_SIZE);
   if (fifo_create_res - FIFO_SIZE != 0)
   {
@@ -340,18 +341,17 @@ static __init int send_init(void)
     rt_printk("Failed to create cmd fifo handler with %d!\n", handler_res);
     ret = -1;
   }
-  fifo_destroy_res = rtf_destroy(FIFO_ACK);
-  if (fifo_destroy_res < 0)
-  {
-    rt_printk("Failed to destroy ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_destroy_res);
-    ret = -1;
-  }
-  fifo_create_res = rtf_create(FIFO_ACK, FIFO_SIZE);
-  if (fifo_create_res - FIFO_SIZE != 0)
-  {
-    rt_printk("Failed to create ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_create_res);
-    ret = -1;
-  }
+  // fifo_destroy_res = rtf_destroy(FIFO_ACK);
+  // if (fifo_destroy_res < 0)
+  // {
+  //   rt_printk("Failed to destroy ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_destroy_res);
+  // }
+  // fifo_create_res = rtf_create(FIFO_ACK, FIFO_SIZE);
+  // if (fifo_create_res - FIFO_SIZE != 0)
+  // {
+  //   rt_printk("Failed to create ack fifo (channel %d) with %d!\n", FIFO_ACK, fifo_create_res);
+  //   ret = -1;
+  // }
 
   // int task_init_res = rt_task_init(&magnetic_task, send_magnetic_msg_task, 0, STACK_SIZE, 2, 0, 0);
   // if (task_init_res != 0)
