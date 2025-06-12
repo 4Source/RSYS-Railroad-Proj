@@ -21,7 +21,7 @@ int send_with_ack(unsigned short data, int attempts)
     }
 
     // Open the acknowledgment FIFO in read-only, non-blocking mode
-    int fd_cmd = open(O_RDONLY | O_NONBLOCK);
+    int fd_cmd = open(FIFO_ACK, O_RDONLY | O_NONBLOCK);
     //int fd_ack = rtf_open_sized(FIFO_ACK, O_RDONLY | O_NONBLOCK, SIZE);
     if (fd_ack < 0)
     {
