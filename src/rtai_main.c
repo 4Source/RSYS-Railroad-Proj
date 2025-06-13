@@ -8,7 +8,6 @@
 #include "telegram/locomotive.h"
 #include "telegram/magnetic.h"
 #include "telegram/reset.h"
-#include "config.h"
 
 #define FIFO_CMD 3
 #define FIFO_ACK 4
@@ -23,12 +22,21 @@
 #define LPT1 0x378        /* Parallel port address */
 #define BIT_MESSAGE_LENGTH 42
 
-LocomotiveData locomotive_msg_queue[LOC_SIZE];
-memcpy(locomotive_msg_queue, &locomotives_user.data, LOC_SIZE * sizeof(locomotive_msg_queue));
+#define LOC_SIZE 2
+LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
+    {.address = 1, .light = 0, .direction = 0, .speed = 0},
+    {.address = 2, .light = 0, .direction = 0, .speed = 0},
+    // {.address = 3, .light = 1, .direction = 1, .speed = 0},
+};
 
+#define MAG_SIZE 4
 int magnetic_msg_count = 0;
-MagneticData magnetic_msg_queue[MAG_SIZE];
-memcpy(magnetic_msg_queue, &magnetic_user.data, MAG_SIZE * sizeof(magnetic_msg_queue));
+MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {
+    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
+    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
+    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
+    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
+};
 
 static SEM bit_sem;
 static SEM loc_sem[LOC_SIZE];
