@@ -5,8 +5,8 @@
 #include "telegram/magnetic.h"
 
 Locomotive locomotives_user[] = {
-    {.alias = "loc3", .data = {
-                          .address = 3,
+    {.alias = "loc1", .data = {
+                          .address = 1,
                           .direction = 1,
                           .light = 1,
                           .speed = 0,
