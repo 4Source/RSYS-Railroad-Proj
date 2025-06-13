@@ -25,8 +25,8 @@
 #define LOC_MSQ_SIZE 2
 LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
     {.address = 1, .light = 0, .direction = 0, .speed = 0},
-    // {.address = 2, .light = 0, .direction = 0, .speed = 0},
-    {.address = 3, .light = 1, .direction = 1, .speed = 0},
+    {.address = 2, .light = 0, .direction = 0, .speed = 0},
+    // {.address = 3, .light = 1, .direction = 1, .speed = 0},
 };
 
 #define MAG_MSQ_SIZE 4
