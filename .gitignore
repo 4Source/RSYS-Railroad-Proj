@@ -6,6 +6,8 @@
 *.symvers
 *.order
 *.mod.c
+*.o.d
 
+src/dcc
 /.vscode
 /src/.tmp_versions
