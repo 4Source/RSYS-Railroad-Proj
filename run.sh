@@ -14,10 +14,10 @@ done
 
 # Run make command to build the module
 echo "Building the module..."
-make
+make || { echo "Build failed."; exit 1; }
 
 # Remove old module if present
-MODULE_NAME=("rtai_module")
+MODULE_NAME=("rtai_main")
 for (( idx=${#MODULE_NAME[@]}-1; idx>=0; idx-- )); do
     MODULE="${MODULE_NAME[idx]}"
     if lsmod | grep "$MODULE" &> /dev/null; then
