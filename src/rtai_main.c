@@ -8,6 +8,7 @@
 #include "telegram/locomotive.h"
 #include "telegram/magnetic.h"
 #include "telegram/reset.h"
+#include "config.h"
 
 #define FIFO_CMD 3
 #define FIFO_ACK 4
@@ -22,27 +23,18 @@
 #define LPT1 0x378        /* Parallel port address */
 #define BIT_MESSAGE_LENGTH 42
 
-#define LOC_MSQ_SIZE 2
-LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
-    {.address = 1, .light = 0, .direction = 0, .speed = 0},
-    {.address = 2, .light = 0, .direction = 0, .speed = 0},
-    // {.address = 3, .light = 1, .direction = 1, .speed = 0},
-};
+#define LOC_SIZE 2
+LocomotiveData locomotive_msg_queue[LOC_SIZE] = locomotives_user.data;
 
-#define MAG_MSQ_SIZE 4
+#define MAG_SIZE 4
 int magnetic_msg_count = 0;
-MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {
-    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
-    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
-    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
-    {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
-};
+MagneticData magnetic_msg_queue[MAG_SIZE] = magnetic_user.data;
 
 static SEM bit_sem;
-static SEM loc_sem[LOC_MSQ_SIZE];
-static SEM mag_sem[MAG_MSQ_SIZE];
+static SEM loc_sem[LOC_SIZE];
+static SEM mag_sem[MAG_SIZE];
 
-RT_TASK loco_tasks[LOC_MSQ_SIZE];
+RT_TASK loco_tasks[LOC_SIZE];
 RT_TASK magnetic_task;
 RT_TASK init_task;
 
@@ -86,7 +78,7 @@ void send_ack(unsigned short raw)
 int findIndexOfLocAddress(LocomotiveData loc)
 {
   int i;
-  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  for (i = 0; i < LOC_SIZE; i++)
   {
     if (locomotive_msg_queue[i].address == loc.address)
     {
@@ -109,7 +101,7 @@ int findIndexOfLocAddress(LocomotiveData loc)
 int findIndexOfMagAddress(MagneticData mag)
 {
   int i;
-  for (i = 0; i < MAG_MSQ_SIZE; i++)
+  for (i = 0; i < MAG_SIZE; i++)
   {
     if (magnetic_msg_queue[i].address == mag.address && magnetic_msg_queue[i].device == mag.device)
     {
@@ -188,7 +180,7 @@ int fifo_handler(unsigned int fifo)
         rt_printk("Magnetic Addr %d: Device=%d Enable=%d Ctrl=%d\n", converter.magnetic_data.address, converter.magnetic_data.device, converter.magnetic_data.enable, converter.magnetic_data.control);
         send_ack(raw);
       }
-      else if (magnetic_msg_count < MAG_MSQ_SIZE)
+      else if (magnetic_msg_count < MAG_SIZE)
       {
         // If not found, use next free slot
         rt_sem_wait(&mag_sem[magnetic_msg_count]);
@@ -465,14 +457,14 @@ void send_magnetic_msg_task(long arg)
  *   - It sends the built telegram using send_bit_task, with a fixed message length defined by BIT_MESSAGE_LENGTH.
  *
  * @param i: An integer representing the index into loc_sem and locomotive_msg_queue arrays. Must be
- *           within the range [0, LOC_MSQ_SIZE) to ensure valid access.
+ *           within the range [0, LOC_SIZE) to ensure valid access.
  */
 void send_loco_msg_task(long i)
 {
   rt_printk("Starting locomotive msg task %d", i);
   while (1)
   {
-    if (i >= 0 && i < LOC_MSQ_SIZE)
+    if (i >= 0 && i < LOC_SIZE)
     {
       rt_sem_wait(&loc_sem[i]);
       unsigned long long telegram = buildLocomotiveTelegram(locomotive_msg_queue[i]);
@@ -520,11 +512,11 @@ static __init int send_init(void)
 
   rt_printk("Initialize sem");
   rt_sem_init(&bit_sem, 1);
-  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  for (i = 0; i < LOC_SIZE; i++)
   {
     rt_sem_init(&loc_sem[i], 1);
   }
-  for (i = 0; i < MAG_MSQ_SIZE; i++)
+  for (i = 0; i < MAG_SIZE; i++)
   {
     rt_sem_init(&mag_sem[i], 1);
   }
@@ -566,7 +558,7 @@ static __init int send_init(void)
   // }
   // Initializes for each locomotive its own periodic task with
   // the task pointer, the function, the index of the current loc which specify for which loc the task is responsible for, the Stack size, priority
-  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  for (i = 0; i < LOC_SIZE; i++)
   {
     task_init_res = rt_task_init(&loco_tasks[i], send_loco_msg_task, i, STACK_SIZE, 2, 0, 0);
     if (task_init_res != 0)
@@ -593,7 +585,7 @@ static __init int send_init(void)
   //   rt_printk("Failed to make periodic magnetic task with %d!\n", task_make_res);
   //   ret = -1;
   // }
-  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  for (i = 0; i < LOC_SIZE; i++)
   {
     rt_printk("Make periodic task 'loc %d'\n", i);
     task_make_res = rt_task_make_periodic(&loco_tasks[i], rt_get_time() + nano2count(10000000), nano2count(PERIOD_LOC_TASK + i));
@@ -618,7 +610,7 @@ static __exit void send_exit(void)
 
   rt_task_delete(&init_task);
   // rt_task_delete(&magnetic_task);
-  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  for (i = 0; i < LOC_SIZE; i++)
   {
     rt_task_delete(&loco_tasks[i]);
   }
@@ -627,11 +619,11 @@ static __exit void send_exit(void)
   rtf_destroy(FIFO_CMD);
 
   rt_sem_delete(&bit_sem);
-  for (i = 0; i < LOC_MSQ_SIZE; i++)
+  for (i = 0; i < LOC_SIZE; i++)
   {
     rt_sem_delete(&loc_sem[i]);
   }
-  for (i = 0; i < MAG_MSQ_SIZE; i++)
+  for (i = 0; i < MAG_SIZE; i++)
   {
     rt_sem_delete(&mag_sem[i]);
   }

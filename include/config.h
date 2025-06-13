@@ -4,6 +4,7 @@
 #include "telegram/locomotive.h"
 #include "telegram/magnetic.h"
 
+#define LOC_SIZE = 2
 Locomotive locomotives_user[] = {
     {.alias = "loc3", .data = {
                           .address = 3,
@@ -11,14 +12,15 @@ Locomotive locomotives_user[] = {
                           .light = 1,
                           .speed = 0,
                       }},
-    {.alias = "loc1", .data = {
-                          .address = 1,
+    {.alias = "loc2", .data = {
+                          .address = 2,
                           .direction = 1,
                           .light = 1,
                           .speed = 0,
                       }},
 };
 
+#define MAG_SIZE = 4
 Magnetic magnetic_user[] = {
     {.alias = "switch0", .data = {
                              .address = 0,
