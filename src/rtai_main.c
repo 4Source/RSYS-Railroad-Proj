@@ -23,12 +23,12 @@
 #define LPT1 0x378        /* Parallel port address */
 #define BIT_MESSAGE_LENGTH 42
 
-#define LOC_SIZE 2
-LocomotiveData locomotive_msg_queue[LOC_SIZE] = locomotives_user.data;
+LocomotiveData locomotive_msg_queue[LOC_SIZE];
+memcpy(locomotive_msg_queue, &locomotives_user.data, LOC_SIZE * sizeof(locomotive_msg_queue));
 
-#define MAG_SIZE 4
 int magnetic_msg_count = 0;
-MagneticData magnetic_msg_queue[MAG_SIZE] = magnetic_user.data;
+MagneticData magnetic_msg_queue[MAG_SIZE];
+memcpy(magnetic_msg_queue, &magnetic_user.data, MAG_SIZE * sizeof(magnetic_msg_queue));
 
 static SEM bit_sem;
 static SEM loc_sem[LOC_SIZE];
