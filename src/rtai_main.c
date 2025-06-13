@@ -23,7 +23,7 @@
 #define BIT_MESSAGE_LENGTH 42
 
 #define LOC_SIZE 2
-LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
+LocomotiveData locomotive_msg_queue[LOC_SIZE] = {
     {.address = 1, .light = 0, .direction = 0, .speed = 0},
     {.address = 2, .light = 0, .direction = 0, .speed = 0},
     // {.address = 3, .light = 1, .direction = 1, .speed = 0},
@@ -31,7 +31,7 @@ LocomotiveData locomotive_msg_queue[LOC_MSQ_SIZE] = {
 
 #define MAG_SIZE 4
 int magnetic_msg_count = 0;
-MagneticData magnetic_msg_queue[MAG_MSQ_SIZE] = {
+MagneticData magnetic_msg_queue[MAG_SIZE] = {
     {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
     {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
     {.ack = 0, .address = 0, .control = 0, .device = 0, .enable = 0, .type = 0},
