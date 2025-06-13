@@ -8,7 +8,6 @@
 #include "communication/rtai_linux_communication.h"
 
 #define STACK_SIZE 4096
-#define FIFO_SIZE 1024
 #define PERIOD_TIMER 1000000
 #define PERIOD_MAG_TASK 50000000
 #define PERIOD_LOC_TASK 5000000

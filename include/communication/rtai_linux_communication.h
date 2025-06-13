@@ -11,6 +11,7 @@
 
 #define FIFO_CMD 3
 #define FIFO_ACK 4
+#define FIFO_SIZE 1024
 #define STACK_SIZE 4096
 
 /**
