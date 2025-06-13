@@ -32,7 +32,7 @@ void send_bit_task(unsigned long long message, int bit_message_length)
   rt_sem_signal(&bit_sem);
 }
 
-void send_magnetic_msg_task(void) // TODO: if not working then add (long arg)
+void send_magnetic_msg_task(long arg)
 {
   rt_printk("Starting magnetic msg task");
   while (1)
@@ -74,7 +74,7 @@ void send_loco_msg_task(long i)
   }
 }
 
-void send_init_dcc(void) // TODO: if not working then add (long arg)
+void send_init_dcc(long arg)
 {
   rt_printk("Start initialization of dcc system...\n");
   unsigned long long reset_msg = buildResetAllTelegram();
