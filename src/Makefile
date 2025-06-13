@@ -11,9 +11,9 @@ INCLUDE_DIR := $(PWD)/include
 
 # Set the name of the kernel module
 obj-m	:= rtai_main.o
-rtai_main-y += telegram/locomotive.o telegram/magnetic.o telegram/idle.o telegram/reset.o
-rtai_main-y += communication/railroad_communication.o 
-rtai_main-y += communication/rtai_linux_communication.o
+# rtai_main-y += telegram/locomotive.o telegram/magnetic.o telegram/idle.o telegram/reset.o
+# rtai_main-y += communication/railroad_communication.o 
+# rtai_main-y += communication/rtai_linux_communication.o
 
 # Flags to give to the compiler
 ccflags-y := -I/usr/realtime/include -I/usr/src/linux/include 
